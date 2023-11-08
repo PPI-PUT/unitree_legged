@@ -1,0 +1,4 @@
+LegState front_right
+LegState front_left
+LegState rear_right
+LegState rear_left

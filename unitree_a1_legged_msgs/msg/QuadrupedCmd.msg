@@ -1,0 +1,4 @@
+LegCmd front_right
+LegCmd front_left
+LegCmd rear_right
+LegCmd rear_left
