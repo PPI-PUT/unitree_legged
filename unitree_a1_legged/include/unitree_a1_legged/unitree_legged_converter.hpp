@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <unordered_map>
+#include <vector>
 
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
@@ -25,6 +26,7 @@
 #include "unitree_a1_legged_msgs/msg/quadruped_state.hpp"
 #include "unitree_a1_legged_msgs/msg/quadruped_cmd.hpp"
 #include "unitree_a1_legged_msgs/msg/foot_force_state.hpp"
+#include "unitree_a1_legged_msgs/msg/joint_command.hpp"
 
 using namespace UNITREE_LEGGED_SDK;
 
@@ -60,6 +62,7 @@ namespace unitree_a1_legged
          * @brief Converts from LowCmd ROS2 message to UNITREE_LEGGED_SDK::LowCmd.
          */
         static void msgToCmd(const unitree_a1_legged_msgs::msg::LowCmd::SharedPtr msg, LowCmd &cmd);
+        static void msgToCmd(const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg, LowCmd &cmd);
         /**
          * @brief Converts from QuadrupedCmd ROS2 message to UNITREE_LEGGED_SDK::LowCmd.
          */
@@ -81,9 +84,13 @@ namespace unitree_a1_legged
          */
         static size_t getJointCount();
         /**
-         * @brief Converts the UNITREE_LEGGED_SDK::LowState to a ROS2 message.
+         * @brief Get the Joint State Msg object
          */
         static sensor_msgs::msg::JointState getJointStateMsg(const LowState &state);
+        /**
+         * @brief Get the Joint Command Msg object
+         */
+        static unitree_a1_legged_msgs::msg::JointCommand getJointCommandMsg();
     };
 
 } // namespace unitree_a1_legged

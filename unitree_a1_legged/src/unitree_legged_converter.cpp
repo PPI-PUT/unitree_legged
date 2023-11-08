@@ -118,6 +118,26 @@ namespace unitree_a1_legged
         // cmd.reserve = msg->reserve;
         // cmd.crc = msg->crc;
     }
+    void Converter::msgToCmd(const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg, LowCmd &cmd)
+    {
+        // check size of msg
+        if (msg->joint.name.size() != Converter::getJointCount() ||
+            msg->joint.position.size() != Converter::getJointCount() ||
+            msg->joint.velocity.size() != Converter::getJointCount() ||
+            msg->joint.effort.size() != Converter::getJointCount())
+        {
+            return;
+        }
+        for (const auto &[key, value] : Converter::jointIndexMap)
+        {
+            cmd.motorCmd[value].mode = msg->mode;
+            cmd.motorCmd[value].Kp = msg->kp;
+            cmd.motorCmd[value].Kd = msg->kd;
+            cmd.motorCmd[value].q = msg->joint.position[value];
+            cmd.motorCmd[value].dq = msg->joint.velocity[value];
+            cmd.motorCmd[value].tau = msg->joint.effort[value];
+        }
+    }
     void Converter::msgToCmd(const unitree_a1_legged_msgs::msg::QuadrupedCmd msg, LowCmd &cmd)
     {
         cmd.motorCmd[FR_0] = Converter::msgToCmd(msg.front_right.hip);
@@ -187,6 +207,17 @@ namespace unitree_a1_legged
             msg.velocity[value] = state.motorState[value].dq;
             msg.effort[value] = state.motorState[value].tauEst;
         }
+        return msg;
+    }
+    unitree_a1_legged_msgs::msg::JointCommand Converter::getJointCommandMsg()
+    {
+        unitree_a1_legged_msgs::msg::JointCommand msg;
+        sensor_msgs::msg::JointState joint_msg;
+        joint_msg.name = Converter::getJointNames();
+        joint_msg.position.resize(Converter::getJointCount());
+        joint_msg.velocity.resize(Converter::getJointCount());
+        joint_msg.effort.resize(Converter::getJointCount());
+        msg.joint = joint_msg;
         return msg;
     }
 
