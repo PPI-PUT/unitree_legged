@@ -15,6 +15,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Eigen/Dense"
+
+#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 
@@ -29,6 +34,9 @@
 #include "unitree_a1_legged_msgs/msg/joint_command.hpp"
 
 using namespace UNITREE_LEGGED_SDK;
+
+using Vector3f = Eigen::Vector3f;
+using Quaternionf = Eigen::Quaternionf;
 
 namespace unitree_a1_legged
 {
@@ -91,6 +99,13 @@ namespace unitree_a1_legged
          * @brief Get the Joint Command Msg object
          */
         static unitree_a1_legged_msgs::msg::JointCommand getJointCommandMsg();
+        static std::vector<float> convertToGravityVector(const geometry_msgs::msg::Quaternion &orientation,
+                                                         const geometry_msgs::msg::Vector3 &linear_acceleration);
+        static std::vector<float> msgsToTensor(const unitree_a1_legged_msgs::msg::LowState::SharedPtr msg,
+                                               const geometry_msgs::msg::TwistStamped::SharedPtr twist_msg,
+                                               const std::vector<float> &last_action,
+                                               const std::vector<float> &last_contact,
+                                               const int16_t footForceThreshold);
     };
 
 } // namespace unitree_a1_legged

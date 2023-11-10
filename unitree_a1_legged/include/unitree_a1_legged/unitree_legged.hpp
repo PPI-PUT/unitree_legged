@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
-
 using namespace UNITREE_LEGGED_SDK;
 
 namespace unitree_a1_legged

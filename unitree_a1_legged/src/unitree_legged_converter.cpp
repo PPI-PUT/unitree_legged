@@ -220,5 +220,99 @@ namespace unitree_a1_legged
         msg.joint = joint_msg;
         return msg;
     }
+    std::vector<float> Converter::convertToGravityVector(const geometry_msgs::msg::Quaternion &orientation,
+                                                         const geometry_msgs::msg::Vector3 &linear_acceleration)
+    {
+        Quaternionf imu_orientation(orientation.w, orientation.x, orientation.y, orientation.z);
+        // Define the gravity vector in world frame (assuming it's along -z)
+        Vector3f gravity_world(0.0, 0.0, -9.81);
+        // Rotate the gravity vector to the sensor frame
+        Vector3f gravity_sensor = imu_orientation.conjugate() * gravity_world;
+        // Subtract the linear acceleration to get the gravity vector
+        Vector3f gravity_vec = gravity_sensor - Vector3f(linear_acceleration.x, linear_acceleration.y, linear_acceleration.z);
+        gravity_vec.normalize();
+        return {static_cast<float>(gravity_vec.x()),
+                static_cast<float>(gravity_vec.y()),
+                static_cast<float>(gravity_vec.z())};
+    }
+    std::vector<float> Converter::msgsToTensor(const unitree_a1_legged_msgs::msg::LowState::SharedPtr msg,
+                                               const geometry_msgs::msg::TwistStamped::SharedPtr twist_msg,
+                                               const std::vector<float> &last_action,
+                                               const std::vector<float> &last_contact,
+                                               const int16_t footForceThreshold)
+    {
+        std::vector<float> tensor;
+        // position
+        auto pushJointPositions = [&](const auto &joint)
+        {
+            tensor.push_back(joint.hip.q);
+            tensor.push_back(joint.thigh.q);
+            tensor.push_back(joint.calf.q);
+        };
+        // Joint positions
+        pushJointPositions(msg->motor_state.front_right);
+        pushJointPositions(msg->motor_state.front_left);
+        pushJointPositions(msg->motor_state.rear_right);
+        pushJointPositions(msg->motor_state.rear_left);
+        // roll pitch yaw
+        tensor.push_back(msg->imu.angular_velocity.x);
+        tensor.push_back(msg->imu.angular_velocity.y);
+        tensor.push_back(msg->imu.angular_velocity.z);
+        // velocity
+        auto pushJointVelocities = [&](const auto &joint)
+        {
+            tensor.push_back(joint.hip.dq);
+            tensor.push_back(joint.thigh.dq);
+            tensor.push_back(joint.calf.dq);
+        };
+        // Joint velocities
+        pushJointVelocities(msg->motor_state.front_right);
+        pushJointVelocities(msg->motor_state.front_left);
+        pushJointVelocities(msg->motor_state.rear_right);
+        pushJointVelocities(msg->motor_state.rear_left);
+        // goal
+        tensor.push_back(twist_msg->twist.linear.x);
+        tensor.push_back(twist_msg->twist.linear.y);
+        tensor.push_back(twist_msg->twist.angular.z);
+        // contact
+        auto tick = msg->tick;
+        auto pushCyclesSinceLastContact = [&](size_t index)
+        {
+            return ((1.0f == tensor.back()) ? 0.0f : tick + last_contact[index]);
+        };
+        auto convertFootForce = [&](const int16_t force, const int16_t footForceThreshold)
+        {
+            return (force < footForceThreshold) ? 0.0f : 1.0f;
+        };
+        tensor.push_back(convertFootForce(msg->foot_force.front_left,
+                                          footForceThreshold));
+        auto fr_cycles_since_last_contact = pushCyclesSinceLastContact(FR_);
+
+        tensor.push_back(convertFootForce(msg->foot_force.front_right,
+                                          footForceThreshold));
+        auto fl_cycles_since_last_contact = pushCyclesSinceLastContact(FL_);
+
+        tensor.push_back(convertFootForce(msg->foot_force.rear_right,
+                                          footForceThreshold));
+        auto rr_cycles_since_last_contact = pushCyclesSinceLastContact(RR_);
+
+        tensor.push_back(convertFootForce(msg->foot_force.rear_left,
+                                          footForceThreshold));
+        auto rl_cycles_since_last_contact = pushCyclesSinceLastContact(RL_);
+        // gravity
+        auto gravity_vec = Converter::convertToGravityVector(msg->imu.orientation,
+                                                             msg->imu.linear_acceleration);
+        tensor.push_back(gravity_vec[0]);
+        tensor.push_back(gravity_vec[1]);
+        tensor.push_back(gravity_vec[2]);
+        // last action
+        tensor.insert(tensor.end(), last_action.begin(), last_action.end());
+        // cycles since last contact
+        tensor.push_back(fr_cycles_since_last_contact);
+        tensor.push_back(fl_cycles_since_last_contact);
+        tensor.push_back(rr_cycles_since_last_contact);
+        tensor.push_back(rl_cycles_since_last_contact);
+        return tensor;
+    }
 
 } // namespace unitree_a1_legged
