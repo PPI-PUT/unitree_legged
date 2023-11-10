@@ -5,7 +5,7 @@ docker build -t a1_ros2 .
 ```
 
 ## Run Docker
-example graphics: 
+example: 
 ```
 xhost +local:root
 

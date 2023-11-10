@@ -1,7 +1,7 @@
 # unitree_legged
 
 
-## Prerequisites
+## Dependecies
 ```
 vcs import < deps.repos
 cd /unitree_a1_legged/lcm
