@@ -36,6 +36,7 @@ namespace unitree_a1_legged
         // state_thread_ = std::thread(std::bind(&UnitreeLeggedNode::updateLoop, this));
         state_publisher_ = this->create_publisher<unitree_a1_legged_msgs::msg::LowState>("~/state", 1);
         joint_state_publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("~/joint_states", 1);
+        joint_state_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::JointCommand>("~/joint_command", 1, std::bind(&UnitreeLeggedNode::receiveJointCommandCallback, this, std::placeholders::_1));
         low_command_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::LowCmd>("~/command", 1, std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
         timer_ = this->create_wall_timer(2ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
     }
@@ -63,7 +64,13 @@ namespace unitree_a1_legged
         Converter::msgToCmd(msg, low_cmd_once);
         unitree_.sendLowCmd(low_cmd_once);
     }
-
+    void UnitreeLeggedNode::receiveJointCommandCallback(const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg)
+    {
+        // Convert to lowlevel cmd
+        auto low_cmd_once = unitree_.getLowCmd();
+        Converter::msgToCmd(msg, low_cmd_once);
+        unitree_.sendLowCmd(low_cmd_once);
+    }
     void UnitreeLeggedNode::updateStateCallback()
     {
         // Get state
