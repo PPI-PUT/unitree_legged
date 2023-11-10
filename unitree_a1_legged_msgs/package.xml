@@ -5,7 +5,7 @@
   <version>0.1.0</version>
   <description>Unitree legged msgs</description>
   <maintainer email="maciej.p.krupka@student.put.poznan.pl">Maciej Krupka</maintainer>
-  <license>Apache License 2.0</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>geometry_msgs</depend>

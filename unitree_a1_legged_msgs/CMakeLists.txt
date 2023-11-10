@@ -17,6 +17,7 @@ set(msg_files
     "msg/FootForceState.msg"
     "msg/HighCmd.msg"
     "msg/HighState.msg"
+    "msg/JointCommand.msg"
     "msg/LegCmd.msg"
     "msg/LegState.msg"
     "msg/LowCmd.msg"
