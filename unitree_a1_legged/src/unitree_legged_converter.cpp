@@ -221,4 +221,37 @@ namespace unitree_a1_legged
         return msg;
     }
 
+    sensor_msgs::msg::Joy Converter::stateToMsg(const uint8_t (&state)[40])
+    {
+        sensor_msgs::msg::Joy msg;
+        xRockerBtnDataStruct keydata;
+        std::memcpy(&keydata, state, sizeof(keydata));
+        msg.axes.push_back(keydata.lx);
+        msg.axes.push_back(keydata.rx);
+        msg.axes.push_back(keydata.ry);
+        msg.axes.push_back(keydata.ly);
+        msg.axes.push_back(keydata.L2);
+        // lamda uint_8 to int16
+        auto uint8ToInt16 = [](uint8_t data)
+        {
+            return static_cast<int16_t>(data);
+        };
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.R1));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.L1));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.start));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.select));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.R2));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.L2));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.F1));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.F2));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.A));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.B));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.X));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.Y));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.up));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.right));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.down));
+        msg.buttons.push_back(uint8ToInt16(keydata.btn.components.left));
+        return msg;
+    }
 } // namespace unitree_a1_legged

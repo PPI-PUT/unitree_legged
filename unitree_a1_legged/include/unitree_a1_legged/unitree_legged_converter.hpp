@@ -15,12 +15,12 @@
 #include <unordered_map>
 #include <vector>
 
-
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <sensor_msgs/msg/imu.hpp>
-#include <sensor_msgs/msg/joint_state.hpp>
+#include <sensor_msgs/msg/joy.hpp>
 
 #include "unitree_a1_legged/unitree_legged.hpp"
 #include "unitree_a1_legged_msgs/msg/low_cmd.hpp"
@@ -95,6 +95,7 @@ namespace unitree_a1_legged
          * @brief Get the Joint Command Msg object
          */
         static unitree_a1_legged_msgs::msg::JointCommand getJointCommandMsg();
+        static sensor_msgs::msg::Joy stateToMsg(const uint8_t (&state)[40]);
     };
 
 } // namespace unitree_a1_legged

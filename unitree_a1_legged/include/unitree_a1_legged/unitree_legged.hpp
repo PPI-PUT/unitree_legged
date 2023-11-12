@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
+#include "unitree_legged_sdk/unitree_joystick.h"
 using namespace UNITREE_LEGGED_SDK;
 
 namespace unitree_a1_legged

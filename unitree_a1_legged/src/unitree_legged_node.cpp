@@ -36,6 +36,7 @@ namespace unitree_a1_legged
         // state_thread_ = std::thread(std::bind(&UnitreeLeggedNode::updateLoop, this));
         state_publisher_ = this->create_publisher<unitree_a1_legged_msgs::msg::LowState>("~/state", 1);
         joint_state_publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("~/joint_states", 1);
+        joystick_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>("~/joy", 1);
         joint_state_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::JointCommand>("~/joint_command", 1, std::bind(&UnitreeLeggedNode::receiveJointCommandCallback, this, std::placeholders::_1));
         low_command_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::LowCmd>("~/command", 1, std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
         timer_ = this->create_wall_timer(2ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
@@ -75,14 +76,19 @@ namespace unitree_a1_legged
     {
         // Get state
         unitree_.recvLowState();
+        auto stamp = this->now();
         // Convert to lowlevel state msgs
         auto low_state_ros = Converter::stateToMsg(unitree_.getLowState());
-        low_state_ros.header.stamp = this->now();
+        low_state_ros.header.stamp = stamp;
         state_publisher_->publish(low_state_ros);
         // Convert to joint state msgs
         auto joint_state_msg = Converter::getJointStateMsg(unitree_.getLowState());
-        joint_state_msg.header.stamp = this->now();
+        joint_state_msg.header.stamp = stamp;
         joint_state_publisher_->publish(joint_state_msg);
+        // Convert to joy msgs
+        auto joy_msg = Converter::stateToMsg(unitree_.getLowState().wirelessRemote);
+        joy_msg.header.stamp = stamp;
+        joystick_publisher_->publish(joy_msg);
     }
 
 } // namespace unitree_a1_legged
