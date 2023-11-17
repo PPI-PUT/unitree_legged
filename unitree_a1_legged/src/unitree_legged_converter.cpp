@@ -188,6 +188,10 @@ namespace unitree_a1_legged
         {
             names.push_back(pair.first);
         }
+        // Sort the joint names based on the associated integer values
+        std::sort(names.begin(), names.end(), [](const std::string &a, const std::string &b)
+                  { return jointIndexMap.at(a) < jointIndexMap.at(b); });
+
         return names;
     }
     size_t Converter::getJointCount()
