@@ -35,6 +35,7 @@ namespace unitree_a1_legged
         ~UnitreeLeggedNode();
 
     private:
+        int safety_factor_;
         std::thread state_thread_;
         UnitreeLegged unitree_;
         rclcpp::TimerBase::SharedPtr timer_;

@@ -22,6 +22,8 @@ namespace unitree_a1_legged
     {
         bool hot_start = this->declare_parameter("hot_start", false);
         hot_start = this->get_parameter("hot_start").as_bool();
+        safety_factor_ = this->declare_parameter("safety_factor", 1);
+        safety_factor_ = this->get_parameter("safety_factor").as_int();
         if (!hot_start)
         {
             RCLCPP_INFO(this->get_logger(), "Starting Unitree Legged Node");
@@ -63,14 +65,14 @@ namespace unitree_a1_legged
         // Convert to lowlevel cmd
         auto low_cmd_once = unitree_.getLowCmd();
         Converter::msgToCmd(msg, low_cmd_once);
-        unitree_.sendLowCmd(low_cmd_once);
+        unitree_.sendProtectLowCmd(low_cmd_once, safety_factor_);
     }
     void UnitreeLeggedNode::receiveJointCommandCallback(const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg)
     {
         // Convert to lowlevel cmd
         auto low_cmd_once = unitree_.getLowCmd();
         Converter::msgToCmd(msg, low_cmd_once);
-        unitree_.sendLowCmd(low_cmd_once);
+        unitree_.sendProtectLowCmd(low_cmd_once, safety_factor_);
     }
     void UnitreeLeggedNode::updateStateCallback()
     {

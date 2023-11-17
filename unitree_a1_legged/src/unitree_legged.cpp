@@ -20,7 +20,7 @@ namespace unitree_a1_legged
 {
 
     UnitreeLegged::UnitreeLegged()
-        : low_udp_(LOWLEVEL)
+        : low_udp_(LOWLEVEL), safe_(LeggedType::A1)
     {
         low_udp_.InitCmdData(low_cmd_);
     }
@@ -46,6 +46,12 @@ namespace unitree_a1_legged
     }
     void UnitreeLegged::sendLowCmd(LowCmd &cmd)
     {
+        low_udp_.SetSend(cmd);
+        low_udp_.Send();
+    }
+    void UnitreeLegged::sendProtectLowCmd(LowCmd &cmd, const int input_factor)
+    {
+        safe_.PowerProtect(cmd, low_state_, input_factor);
         low_udp_.SetSend(cmd);
         low_udp_.Send();
     }

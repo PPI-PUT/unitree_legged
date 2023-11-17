@@ -54,6 +54,7 @@ namespace unitree_a1_legged
         /**
          * @brief Receives the LowState object from the robot.
          */
+        void sendProtectLowCmd(LowCmd &cmd, const int input_factor);
         void recvLowState();
 
     private:
@@ -69,6 +70,7 @@ namespace unitree_a1_legged
          * @brief The LowState object used for receiving state from the robot. Ignore: missing-field-initializers
          */
         LowState low_state_ = {0};
+        Safety safe_;
     };
 
     class UnitreeLeggedHighLevel
