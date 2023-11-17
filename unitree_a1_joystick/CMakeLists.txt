@@ -16,10 +16,10 @@ include_directories(include)
 
 add_executable(unitree_a1_joystick src/unitree_a1_joystick.cpp src/unitree_a1_joystick_node.cpp)
 ament_target_dependencies(unitree_a1_joystick rclcpp sensor_msgs geometry_msgs)
-target_include_directories(unitree_a1_joystick PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(unitree_a1_joystick PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+# target_include_directories(unitree_a1_joystick PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
+# target_compile_features(unitree_a1_joystick PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
 install(TARGETS unitree_a1_joystick
   DESTINATION lib/${PROJECT_NAME})

@@ -34,9 +34,9 @@ namespace unitree_a1_legged
                 this, get_clock(), period_ns, std::bind(&UnitreeJoystickNode::timerCallback, this));
 
             // Create publishers
-            twist_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("~/cmd", 1);
+            twist_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("~/cmd_vel", 1);
             // Create subscribers
-            joystick_subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>("~/joy", 1, std::bind(&UnitreeJoystickNode::receiveJoystickCallback, this, std::placeholders::_1));
+            joystick_subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>("/unitree_lowlevel/joy", 1, std::bind(&UnitreeJoystickNode::receiveJoystickCallback, this, std::placeholders::_1));
         }
 
     private:
@@ -75,7 +75,7 @@ namespace unitree_a1_legged
             if (joy_->angular_z())
             {
                 twist_msg.twist.angular.z =
-                    angular_ratio_ * calcMappingdouble(static_cast<double>(joy_->linear_y()), angular_z_sensitivity_);
+                    angular_ratio_ * calcMappingdouble(static_cast<double>(joy_->angular_z()), angular_z_sensitivity_);
             }
             twist_publisher_->publish(twist_msg);
         }
@@ -90,7 +90,7 @@ namespace unitree_a1_legged
         }
         bool isDataReady()
         {
-            if (joy_ != nullptr)
+            if (!joy_)
             {
                 RCLCPP_WARN_THROTTLE(
                     get_logger(), *get_clock(), std::chrono::milliseconds(5000).count(),

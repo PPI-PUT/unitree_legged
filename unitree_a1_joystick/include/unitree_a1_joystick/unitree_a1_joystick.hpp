@@ -6,8 +6,8 @@ namespace unitree_a1_legged
     {
     public:
         UnitreeJoystick(const sensor_msgs::msg::Joy &j) : j_(j) {}
-        float linear_x() { return lx(); }
-        float linear_y() { return ly(); }
+        float linear_x() { return ly(); }
+        float linear_y() { return lx(); }
         float angular_z() { return rx(); }
 
     private:
