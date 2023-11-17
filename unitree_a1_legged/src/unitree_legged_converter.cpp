@@ -104,11 +104,11 @@ namespace unitree_a1_legged
         // cmd.robotID = msg->a1.robot_id;
         // cmd.SN = msg->a1.sn;
         // cmd.bandWidth = msg->a1.band_width;
+        Converter::msgToCmd(msg->motor_cmd, cmd);
         for (const auto &[key, value] : Converter::jointIndexMap)
         {
             cmd.motorCmd[value].mode = msg->mode;
         }
-        Converter::msgToCmd(msg->motor_cmd, cmd);
         // for (int i = 0; i < 4; i++)
         // {
         //     cmd.led[i].r = msg->led[i].r;
