@@ -58,9 +58,9 @@ namespace unitree_a1_legged
     unitree_a1_legged_msgs::msg::QuadrupedState Converter::stateToMsg(const MotorState (&state)[20])
     {
         unitree_a1_legged_msgs::msg::QuadrupedState msg;
-        msg.front_left.hip = Converter::stateToMsg(state[FR_0]);
-        msg.front_left.thigh = Converter::stateToMsg(state[FR_1]);
-        msg.front_left.calf = Converter::stateToMsg(state[FR_2]);
+        msg.front_right.hip = Converter::stateToMsg(state[FR_0]);
+        msg.front_right.thigh = Converter::stateToMsg(state[FR_1]);
+        msg.front_right.calf = Converter::stateToMsg(state[FR_2]);
         msg.front_left.hip = Converter::stateToMsg(state[FL_0]);
         msg.front_left.thigh = Converter::stateToMsg(state[FL_1]);
         msg.front_left.calf = Converter::stateToMsg(state[FL_2]);
