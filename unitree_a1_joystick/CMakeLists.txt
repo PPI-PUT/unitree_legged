@@ -1,39 +1,57 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.14)
 project(unitree_a1_joystick)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies(REQUIRED
+  ${${PROJECT_NAME}_BUILD_DEPENDS}
+  ${${PROJECT_NAME}_BUILDTOOL_DEPENDS}
+)
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-include_directories(include)
+add_compile_options(-Wall -Wextra -pedantic -Werror)
 
+set(UNITREE_A1_JOYSTICK_LIB_SRC
+  src/unitree_a1_joystick.cpp
+)
 
+set(UNITREE_A1_JOYSTICK_LIB_HEADERS
+  include/unitree_a1_joystick/unitree_a1_joystick.hpp
+  include/unitree_a1_joystick/visibility_control.hpp
+)
 
-add_executable(unitree_a1_joystick src/unitree_a1_joystick.cpp src/unitree_a1_joystick_node.cpp)
-ament_target_dependencies(unitree_a1_joystick rclcpp sensor_msgs geometry_msgs)
-# target_include_directories(unitree_a1_joystick PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
-# target_compile_features(unitree_a1_joystick PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+ament_auto_add_library(${PROJECT_NAME} SHARED
+  ${UNITREE_A1_JOYSTICK_LIB_SRC}
+  ${UNITREE_A1_JOYSTICK_LIB_HEADERS}
+)
 
-install(TARGETS unitree_a1_joystick
-  DESTINATION lib/${PROJECT_NAME})
+set(UNITREE_A1_JOYSTICK_NODE_SRC
+  src/unitree_a1_joystick_node.cpp
+)
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
-  set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
+set(UNITREE_A1_JOYSTICK_NODE_HEADERS
+  include/unitree_a1_joystick/unitree_a1_joystick_node.hpp
+)
 
-ament_package()
+ament_auto_add_library(${PROJECT_NAME}_node SHARED
+  ${UNITREE_A1_JOYSTICK_NODE_SRC}
+  ${UNITREE_A1_JOYSTICK_NODE_HEADERS}
+)
+rclcpp_components_register_node(${PROJECT_NAME}_node
+  PLUGIN "unitree_a1_joystick::UnitreeA1JoystickNode"
+  EXECUTABLE ${PROJECT_NAME}_node_exe
+)
+
+# if(BUILD_TESTING)
+#   find_package(ament_lint_auto REQUIRED)
+#   ament_lint_auto_find_test_dependencies()
+
+#   ament_add_ros_isolated_gtest(test_unitree_a1_joystick
+#     test/test_unitree_a1_joystick.cpp
+#   )
+#   ament_target_dependencies(test_unitree_a1_joystick ${TEST_SOURCES})
+#   target_link_libraries(test_unitree_a1_joystick ${PROJECT_NAME})
+# endif()
+
+ament_auto_package(INSTALL_TO_SHARE
+  launch
+  config
+)

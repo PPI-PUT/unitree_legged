@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    update_rate: 50
+    linear_ratio: 0.5
+    angular_ratio: 0.5
+    linear_x_sensitivity: 0.5
+    linear_y_sensitivity: 0.5
+    linear_velocity_limit: 0.5
+    angular_z_sensitivity: 0.5
+    angular_velocity_limit: 0.5

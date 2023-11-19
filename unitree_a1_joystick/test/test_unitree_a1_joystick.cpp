@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "gtest/gtest.h"
 #include "unitree_a1_joystick/unitree_a1_joystick.hpp"
 
-#include <iostream>
-
-namespace unitree_a1_joystick
-{
-
-
-}  // namespace unitree_a1_joystick
+TEST(TestUnitreeA1Joystick, TestHello) {
+  std::unique_ptr<unitree_a1_joystick::UnitreeA1Joystick> unitree_a1_joystick_ =
+    std::make_unique<unitree_a1_joystick::UnitreeA1Joystick>();
+  auto result = unitree_a1_joystick_->foo(999);
+  EXPECT_EQ(result, 999);
+}
