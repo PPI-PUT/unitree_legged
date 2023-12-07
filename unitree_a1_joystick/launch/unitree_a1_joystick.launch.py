@@ -1,4 +1,5 @@
 # Copyright 2023 Maciej Krupka
+# Perception for Physical Interaction Laboratory at Poznan University of Technology
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,49 +13,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration
-from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 
 
-def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_joystick_param_file').perform(context)
-    if not param_path:
-        param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_joystick'), 'config', 'unitree_a1_joystick.param.yaml']
-        ).perform(context)
+def generate_launch_description():
+    unitree_a1_joystick_launch_pkg_prefix = get_package_share_directory(
+        "unitree_a1_joystick")
+
+    unitree_a1_joystick_config_param = DeclareLaunchArgument(
+        'unitree_a1_joystick_config_param_file',
+        default_value=[unitree_a1_joystick_launch_pkg_prefix,
+                       '/config/defaults.param.yaml'],
+        description='Node config.'
+    )
 
     unitree_a1_joystick_node = Node(
         package='unitree_a1_joystick',
         executable='unitree_a1_joystick_node_exe',
-        name='unitree_a1_joystick_node',
-        parameters=[
-            param_path
-        ],
+        name='unitree_a1_joystick',
         output='screen',
-        arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
+        parameters=[
+            LaunchConfiguration('unitree_a1_joystick_config_param_file')
+        ],
+        arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs']
     )
 
-    return [
-        unitree_a1_joystick_node
-    ]
-
-
-def generate_launch_description():
-    declared_arguments = []
-
-    def add_launch_arg(name: str, default_value: str = None):
-        declared_arguments.append(
-            DeclareLaunchArgument(name, default_value=default_value)
-        )
-
-    add_launch_arg('unitree_a1_joystick_param_file', '')
-
-    return LaunchDescription([
-        *declared_arguments,
-        OpaqueFunction(function=launch_setup)
+    ld = LaunchDescription([
+        unitree_a1_joystick_config_param,
+        unitree_a1_joystick_node,
     ])
+    return ld
