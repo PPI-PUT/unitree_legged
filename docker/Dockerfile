@@ -37,15 +37,8 @@ RUN tar -xzvf lcm-v1.4.0.tar.gz \
     && make install
 
 WORKDIR /root/ros2_ws/src
-RUN git clone --branch fix/build https://github.com/macnack/unitree_ros2_to_real.git
 
-RUN curl -L -o unitree_legged_sdk-3.5.1.tar.gz https://github.com/unitreerobotics/unitree_legged_sdk/archive/refs/tags/v3.5.1.tar.gz \
-    && tar -xzvf unitree_legged_sdk-3.5.1.tar.gz \
-    && mv unitree_legged_sdk-3.5.1 unitree_legged_sdk \
-    && rm unitree_legged_sdk-3.5.1.tar.gz \
-    && mv ./unitree_legged_sdk ./unitree_ros2_to_real/unitree_ros2_to_real/
-
-RUN git clone https://github.com/macnack/unitree_legged.git
+RUN git clone https://github.com/PPI-PUT/unitree_legged.git
 
 WORKDIR /root/ros2_ws/src/unitree_legged
 RUN mkdir -p a1_description/test \
