@@ -1,4 +1,5 @@
 # Copyright 2023 Maciej Krupka
+# Perception for Physical Interaction Laboratory at Poznan University of Technology
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,13 +23,14 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_joystick_param_file').perform(context)
+    param_path = FindPackageShare('unitree_a1_joystick')
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_joystick'), 'config', 'unitree_a1_joystick.param.yaml']
+            [FindPackageShare('unitree_a1_joystick'), 'config',
+             'unitree_a1_joystick.param.yaml']
         ).perform(context)
 
-    unitree_a1_joystick_node = Node(
+    unitree_a1_joystick = Node(
         package='unitree_a1_joystick',
         executable='unitree_a1_joystick_node_exe',
         name='unitree_a1_joystick_node',
@@ -36,11 +38,12 @@ def launch_setup(context, *args, **kwargs):
             param_path
         ],
         output='screen',
-        arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
+        arguments=['--ros-args', '--log-level',
+                   'info', '--enable-stdout-logs'],
     )
 
     return [
-        unitree_a1_joystick_node
+        unitree_a1_joystick
     ]
 
 
