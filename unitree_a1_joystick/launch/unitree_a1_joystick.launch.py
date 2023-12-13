@@ -23,7 +23,7 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_joystick').perform(context)
+    param_path = FindPackageShare('unitree_a1_joystick')
     if not param_path:
         param_path = PathJoinSubstitution(
             [FindPackageShare('unitree_a1_joystick'), 'config',
