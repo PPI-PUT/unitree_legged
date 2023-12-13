@@ -25,3 +25,4 @@ docker run -it \
     unitree_ros2 \
     /bin/bash
 ```
+before run it you should have created your own ros2_ws/src with packages
