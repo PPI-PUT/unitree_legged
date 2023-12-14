@@ -52,7 +52,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         output="both",
         parameters=[robot_description],
-        remappings=[("joint_states", "unitree_lowlevel/joint_states")]
+        remappings=[("joint_states", "/unitree_lowlevel/joint_states")]
     )
 
     rviz_node = Node(
