@@ -17,10 +17,11 @@ public:
         cmd_ = this->create_publisher<unitree_a1_legged_msgs::msg::LowCmd>("unitree_lowlevel/command", 1);
         pub_ = this->create_publisher<std_msgs::msg::Float64>("example_torque", 1);
     }
+
 private:
     int motiontime_ = 0;
-    const double amplitude_ = 0.5;
-    const double frequency_ = 5.0; // Adjust the frequency as needed
+    const double amplitude_ = .7;
+    const double frequency_ = 2.0; // Adjust the frequency as needed
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr pub_;
     rclcpp::Subscription<unitree_a1_legged_msgs::msg::LowState>::SharedPtr state_;
     rclcpp::Publisher<unitree_a1_legged_msgs::msg::LowCmd>::SharedPtr cmd_;
@@ -51,7 +52,7 @@ private:
         {
             return;
         }
-        cmd_ -> publish(cmd);
+        cmd_->publish(cmd);
     }
 };
 

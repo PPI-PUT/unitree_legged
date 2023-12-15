@@ -1,10 +1,11 @@
 // Copyright 2023 Maciej Krupka
+// Perception for Physical Interaction Laboratory at Poznan University of Technology
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,39 +16,44 @@
 #ifndef UNITREE_A1_JOYSTICK__UNITREE_A1_JOYSTICK_NODE_HPP_
 #define UNITREE_A1_JOYSTICK__UNITREE_A1_JOYSTICK_NODE_HPP_
 
+#include "unitree_a1_joystick/unitree_a1_joystick.hpp"
+#include <geometry_msgs/msg/twist_stamped.hpp>
+
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 
-#include "unitree_a1_joystick/unitree_a1_joystick.hpp"
-#include <geometry_msgs/msg/twist_stamped.hpp>
-namespace unitree_a1_joystick
+double calcMappingdouble(const double input, const double sensitivity)
 {
-using UnitreeA1JoystickPtr = std::unique_ptr<unitree_a1_joystick::UnitreeA1Joystick>;
+    const double exponent = 1.0 / (std::max(0.001, std::min(1.0, sensitivity)));
+    return std::pow(input, exponent);
+}
 
-class UNITREE_A1_JOYSTICK_PUBLIC UnitreeA1JoystickNode : public rclcpp::Node
+namespace unitree_a1_legged
 {
-public:
-  explicit UnitreeA1JoystickNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+    class UNITREE_A1_JOYSTICK_PUBLIC UnitreeJoystickNode : public rclcpp::Node
+    {
+    public:
+        explicit UnitreeJoystickNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
 
-private:
-  double update_rate_;
-  double linear_ratio_;
-  double angular_ratio_;
-  double linear_x_sensitivity_;
-  double linear_y_sensitivity_;
-  double linear_velocity_limit_;
-  double angular_z_sensitivity_;
-  double angular_velocity_limit_;
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_publisher_;
-  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joystick_subscriber_;
-  rclcpp::Time last_joy_received_time_;
-  std::shared_ptr<UnitreeA1Joystick> joy_;
-  void receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg);
-  void publishTwist();
-  void timerCallback();
-  bool isDataReady();
-};
-}  // namespace unitree_a1_joystick
+    private:
+        double update_rate_;
+        double linear_ratio_;
+        double angular_ratio_;
+        double linear_x_sensitivity_;
+        double linear_y_sensitivity_;
+        double linear_velocity_limit_;
+        double angular_z_sensitivity_;
+        double angular_velocity_limit_;
+        rclcpp::TimerBase::SharedPtr timer_;
+        rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_publisher_;
+        rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joystick_subscriber_;
+        rclcpp::Time last_joy_received_time_;
+        std::shared_ptr<UnitreeJoystick> joy_;
+        void receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg);
+        void publishTwist();
+        void timerCallback();
+        bool isDataReady();
+    };
+} // namespace unitree_a1_legged
 
-#endif  // UNITREE_A1_JOYSTICK__UNITREE_A1_JOYSTICK_NODE_HPP_
+#endif // UNITREE_A1_JOYSTICK__UNITREE_A1_JOYSTICK_NODE_HPP_
