@@ -64,6 +64,9 @@ target_link_libraries(udp unitree_legged)
 add_executable(example_torque src/example_torque.cpp)
 target_link_libraries(example_torque unitree_legged)
 
+add_executable(stand src/stand.cpp)
+ament_target_dependencies(stand rclcpp ${dependencies})
+
 install(
   DIRECTORY include/
   DESTINATION include
@@ -80,6 +83,7 @@ install(TARGETS
   udp
   example_position
   example_torque
+  stand
   DESTINATION lib/${PROJECT_NAME}
   )
 install(DIRECTORY

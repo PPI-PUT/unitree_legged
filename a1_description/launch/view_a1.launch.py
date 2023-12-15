@@ -65,7 +65,7 @@ def generate_launch_description():
     )
 
     nodes_to_start = [
-        # joint_state_publisher_node,
+        joint_state_publisher_node,
         robot_state_publisher_node,
         rviz_node,
     ]

@@ -22,13 +22,13 @@ namespace unitree_a1_legged
     {
         sensor_msgs::msg::Imu msg;
         msg.header.frame_id = "imu_link";
-        msg.orientation.x = state.quaternion[0];
-        msg.orientation.y = state.quaternion[1];
-        msg.orientation.z = state.quaternion[2];
-        msg.orientation.w = state.quaternion[3];
+        msg.orientation.x = state.quaternion[1];
+        msg.orientation.y = state.quaternion[2];
+        msg.orientation.z = state.quaternion[3];
+        msg.orientation.w = state.quaternion[0];
         msg.angular_velocity.x = state.gyroscope[0];
-        msg.angular_velocity.y = state.gyroscope[0];
-        msg.angular_velocity.z = state.gyroscope[0];
+        msg.angular_velocity.y = state.gyroscope[1];
+        msg.angular_velocity.z = state.gyroscope[2];
         msg.linear_acceleration.x = state.accelerometer[0];
         msg.linear_acceleration.y = state.accelerometer[1];
         msg.linear_acceleration.z = state.accelerometer[2];
