@@ -48,6 +48,8 @@ ENV UNITREE_SDK_VERSION=3_3
 ENV UNITREE_LEGGED_SDK_PATH=/root/ros2_ws/src/unitree_legged/unitree_a1_legged/unitree_legged_sdk
 
 WORKDIR /root/ros2_ws
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash; colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=On -Wall -Wextra -Wpedantic"
 
 CMD ["bash"]
