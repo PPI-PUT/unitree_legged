@@ -38,7 +38,7 @@ private:
     {
         motiontime++;
         unitree_a1_legged_msgs::msg::LowCmd cmd;
-        cmd.mode = 0x0A; // motor switch to servo (PMSM) mode
+        cmd.common.mode = 0x0A; // motor switch to servo (PMSM) mode
         cmd.motor_cmd.front_right.hip.tau = -0.65f;
         cmd.motor_cmd.front_left.hip.tau = +0.65f;
         cmd.motor_cmd.rear_right.hip.tau = -0.65f;

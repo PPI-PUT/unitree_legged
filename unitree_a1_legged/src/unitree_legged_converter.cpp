@@ -105,9 +105,32 @@ namespace unitree_a1_legged
         // cmd.SN = msg->a1.sn;
         // cmd.bandWidth = msg->a1.band_width;
         Converter::msgToCmd(msg->motor_cmd, cmd);
+        if (msg->common.mode == 0 and msg->common.kp == 0 and msg->common.kd == 0 and msg->common.control_mode == 0)
+        {
+            return;
+        }
         for (const auto &[key, value] : Converter::jointIndexMap)
         {
-            cmd.motorCmd[value].mode = msg->mode;
+            if (msg->common.mode != 0)
+            {
+                cmd.motorCmd[value].mode = msg->common.mode;
+            }
+            if (msg->common.kp != 0)
+            {
+                cmd.motorCmd[value].Kp = msg->common.kp;
+            }
+            if (msg->common.kd != 0)
+            {
+                cmd.motorCmd[value].Kd = msg->common.kd;
+            }
+            // Torque mode
+            if (msg->common.control_mode == 1)
+            {
+                cmd.motorCmd[value].Kp = 0;
+                cmd.motorCmd[value].Kd = 0;
+                cmd.motorCmd[value].q = PosStopF;
+                cmd.motorCmd[value].dq = VelStopF;
+            }
         }
         // for (int i = 0; i < 4; i++)
         // {

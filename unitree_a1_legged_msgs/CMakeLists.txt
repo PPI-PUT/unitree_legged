@@ -14,6 +14,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 set(msg_files
+    "msg/CommonMotorCmd.msg"
     "msg/FootForceState.msg"
     "msg/HighCmd.msg"
     "msg/HighState.msg"

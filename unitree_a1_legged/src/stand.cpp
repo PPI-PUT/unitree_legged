@@ -52,7 +52,7 @@ private:
             RCLCPP_INFO(this->get_logger(), "percent: %f, targetPos: %f", percent_, targetPos_[0]);
 
             motiontime_++;
-            
+
             cmd_msg_.motor_cmd.front_right.hip.q = targetPos_[0];
             cmd_msg_.motor_cmd.front_right.thigh.q = targetPos_[1];
             cmd_msg_.motor_cmd.front_right.calf.q = targetPos_[2];
@@ -72,7 +72,7 @@ private:
     }
     void initParam(unitree_a1_legged_msgs::msg::LowCmd &cmd_msg)
     {
-        cmd_msg.mode = 0x0A;
+        cmd_msg.common.mode = 0x0A;
         cmd_msg.motor_cmd.front_right.hip.mode = 0x0A;
         cmd_msg.motor_cmd.front_right.hip.kp = 70.0;
         cmd_msg.motor_cmd.front_right.hip.kd = 3.0;
@@ -116,14 +116,13 @@ private:
     std::vector<float> targetPos_ = {0.0, 0.67, -1.3, 0.0, 0.67, -1.3,
                                      0.0, 0.67, -1.3, 0.0, 0.67, -1.3};
     std::vector<float> standPos_ = {0.0, 0.67, -1.3, 0.0, 0.67, -1.3,
-                                     0.0, 0.67, -1.3, 0.0, 0.67, -1.3};
+                                    0.0, 0.67, -1.3, 0.0, 0.67, -1.3};
     std::vector<float> lastPos_ = std::vector<float>(targetPos_.size(), 0.0);
     unitree_a1_legged_msgs::msg::LowCmd cmd_msg_;
     float steps_ = 2000.0;
     float percent_ = 0.0;
     int motiontime_ = 1;
     bool init_ = true;
-    
 };
 
 int main(int argc, char *argv[])

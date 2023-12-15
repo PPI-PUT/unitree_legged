@@ -30,7 +30,7 @@ private:
         double value = amplitude_ * sin(2.0 * M_PI * frequency_ * motiontime_ / 1000.0);
         motiontime_++;
         unitree_a1_legged_msgs::msg::LowCmd cmd;
-        cmd.mode = 0x0A; // motor switch to servo (PMSM) mode
+        cmd.common.mode = 0x0A; // motor switch to servo (PMSM) mode
         cmd.motor_cmd.front_right.hip.q = a1_Hip_min;
         cmd.motor_cmd.front_right.hip.dq = 0.0;
         cmd.motor_cmd.front_right.hip.tau = 0.0;

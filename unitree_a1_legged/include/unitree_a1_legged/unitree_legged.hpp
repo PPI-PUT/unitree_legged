@@ -14,6 +14,7 @@
 
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 #include "unitree_legged_sdk/unitree_joystick.h"
+#include "unitree_legged_sdk/a1_const.h"
 using namespace UNITREE_LEGGED_SDK;
 
 namespace unitree_a1_legged
