@@ -42,13 +42,7 @@ RUN git clone https://github.com/PPI-PUT/unitree_legged.git
 
 WORKDIR /root/ros2_ws/src/unitree_legged
 RUN mkdir -p a1_description/test \
-    && vcs import < deps.repos \ 
-    && cd unitree_a1_legged/unitree_legged_sdk \
-    && mkdir build \
-    && cd build \
-    && cmake .. \
-    && make
-
+    && vcs import < deps.repos
 
 ENV UNITREE_SDK_VERSION=3_3
 ENV UNITREE_LEGGED_SDK_PATH=/root/ros2_ws/src/unitree_legged/unitree_a1_legged/unitree_legged_sdk
