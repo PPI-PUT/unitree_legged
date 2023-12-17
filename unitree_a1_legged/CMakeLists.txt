@@ -1,16 +1,17 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.14)
 project(unitree_a1_legged)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies(REQUIRED
+  ${${PROJECT_NAME}_BUILD_DEPENDS}
+  ${${PROJECT_NAME}_BUILDTOOL_DEPENDS}
+)
+
+add_compile_options(-Wall -Wextra -pedantic -Werror)
 add_compile_options(-Wno-missing-field-initializers)
 
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(unitree_a1_legged_msgs REQUIRED)
-find_package(Eigen3 REQUIRED)
 message("-- CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+
 if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "x86_64.*")
   set(ARCH amd64)
 else()
@@ -27,71 +28,55 @@ install(
   DIRECTORY ${CMAKE_SOURCE_DIR}/unitree_legged_sdk/lib/
   DESTINATION lib
 )
+
 link_directories(${CMAKE_SOURCE_DIR}/unitree_legged_sdk/lib/)
 set(EXTRA_LIBS -pthread libunitree_legged_sdk_${ARCH}.so lcm)
 
-set(dependencies
-    unitree_a1_legged_msgs
-    rclcpp
-    Eigen3
+set(UNITREE_A1_LEGGED_LIB_SRC
+  src/unitree_a1_legged.cpp
+  src/unitree_a1_legged_converter.cpp
 )
 
-add_library(unitree_legged
-    src/unitree_legged.cpp
-    src/unitree_legged_converter.cpp
-    src/unitree_legged_node.cpp
+set(UNITREE_A1_LEGGED_LIB_HEADERS
+  include/unitree_a1_legged/unitree_a1_legged.hpp
+  include/unitree_a1_legged/unitree_a1_legged_converter.hpp
+  include/unitree_a1_legged/visibility_control.hpp
 )
-target_link_libraries(unitree_legged ${EXTRA_LIBS})
 
-target_include_directories(unitree_legged PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/unitree_legged_sdk/include>
-  $<INSTALL_INTERFACE:include>
+ament_auto_add_library(${PROJECT_NAME} SHARED
+  ${UNITREE_A1_LEGGED_LIB_SRC}
+  ${UNITREE_A1_LEGGED_LIB_HEADERS}
 )
-ament_target_dependencies(unitree_legged ${dependencies})
-
-# rclcpp_components_register_nodes(
-#   unitree_legged
-#   PLUGIN "unitree_a1_legged::UnitreeLeggedNode"
-#   EXECUTABLE ${PROJECT_NAME}_node_exe)
-
-add_executable(example_position src/example_position.cpp)
-ament_target_dependencies(example_position rclcpp ${dependencies})
-
-add_executable(udp src/udp.cpp)
-target_link_libraries(udp unitree_legged)
-
-add_executable(example_torque src/example_torque.cpp)
-target_link_libraries(example_torque unitree_legged)
-
-add_executable(stand src/stand.cpp)
-ament_target_dependencies(stand rclcpp ${dependencies})
-
-install(
-  DIRECTORY include/
-  DESTINATION include
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
+set(UNITREE_A1_LEGGED_NODE_SRC
+  src/unitree_a1_legged_node.cpp
 )
-install(
-  TARGETS unitree_legged
-  EXPORT unitree_legged
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+
+set(UNITREE_A1_LEGGED_NODE_HEADERS
+  include/unitree_a1_legged/unitree_a1_legged_node.hpp
 )
-install(TARGETS
-  udp
-  example_position
-  example_torque
-  stand
-  DESTINATION lib/${PROJECT_NAME}
-  )
-install(DIRECTORY
-  config
+
+ament_auto_add_library(${PROJECT_NAME}_node SHARED
+  ${UNITREE_A1_LEGGED_NODE_SRC}
+  ${UNITREE_A1_LEGGED_NODE_HEADERS}
+)
+rclcpp_components_register_node(${PROJECT_NAME}_node
+  PLUGIN "unitree_a1_legged::UnitreeLeggedNode"
+  EXECUTABLE ${PROJECT_NAME}_node_exe
+)
+
+# if(BUILD_TESTING)
+#   find_package(ament_lint_auto REQUIRED)
+#   ament_lint_auto_find_test_dependencies()
+
+#   ament_add_ros_isolated_gtest(test_unitree_a1_legged
+#     test/test_unitree_a1_legged.cpp
+#   )
+#   ament_target_dependencies(test_unitree_a1_legged ${TEST_SOURCES})
+#   target_link_libraries(test_unitree_a1_legged ${PROJECT_NAME})
+# endif()
+
+ament_auto_package(INSTALL_TO_SHARE
   launch
-  DESTINATION share/${PROJECT_NAME}
+  config
 )
-ament_export_include_directories(include)
-ament_export_libraries(unitree_legged)
-ament_export_dependencies(${dependencies})
-ament_package()

@@ -21,7 +21,7 @@ namespace unitree_a1_legged
       : Node("unitree_a1_joystick", options)
   {
     // Parameters
-    update_rate_ = this->declare_parameter<double>("update_rate", 50.0);
+    update_rate_ = this->declare_parameter<int>("update_rate", 50);
     linear_ratio_ = this->declare_parameter<double>("linear_ratio", 0.5);
     angular_ratio_ = this->declare_parameter<double>("angular_ratio", 0.5);
     linear_x_sensitivity_ = this->declare_parameter<double>("linear_x_sensitivity", 0.5);
@@ -36,9 +36,9 @@ namespace unitree_a1_legged
         this, get_clock(), period_ns, std::bind(&UnitreeJoystickNode::timerCallback, this));
 
     // Create publishers
-    twist_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("~/cmd_vel", 1);
-    // Create subscribers
-    joystick_subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>("/unitree_lowlevel/joy", 1, std::bind(&UnitreeJoystickNode::receiveJoystickCallback, this, std::placeholders::_1));
+    twist_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("~/output/cmd_vel", 1);
+    // Create subscribers #unitree_lowlevel/joy
+    joystick_subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>("~/input/joy", 1, std::bind(&UnitreeJoystickNode::receiveJoystickCallback, this, std::placeholders::_1));
   }
 
   void UnitreeJoystickNode::receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg)

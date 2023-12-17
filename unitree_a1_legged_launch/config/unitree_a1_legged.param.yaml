@@ -1,0 +1,4 @@
+/**:
+  ros__parameters:
+    hot_start: false
+    safety_factor: 1 # 10 is max power (1 is "safety")
