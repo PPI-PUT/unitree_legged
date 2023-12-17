@@ -1,5 +1,4 @@
 # Copyright 2023 Maciej Krupka
-# Perception for Physical Interaction Laboratory at Poznan University of Technology
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,31 +22,31 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_joystick_param_file').perform(context)
+    param_path = LaunchConfiguration('unitree_a1_legged_param_file').perform(context)
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_joystick'), 'config',
-             'unitree_a1_joystick.param.yaml']
+            [FindPackageShare('unitree_a1_legged'), 'config', 'unitree_a1_legged.param.yaml']
         ).perform(context)
 
-    unitree_a1_joystick = Node(
-        package='unitree_a1_joystick',
-        executable='unitree_a1_joystick_node_exe',
-        name='unitree_a1_joystick_node',
+    unitree_a1_legged_node = Node(
+        package='unitree_a1_legged',
+        executable='unitree_a1_legged_node_exe',
+        name='unitree_a1_legged_node',
         parameters=[
             param_path
         ],
         remappings=[
-            ("~/output/cmd_vel", LaunchConfiguration("output_cmd_name")),
-            ("~/input/joy", LaunchConfiguration("input_joy_name"))
+            ("~/output/state", LaunchConfiguration("output_state_name")),
+            ("~/output/joy", LaunchConfiguration("output_joy_name")),
+            ("~/input/command", LaunchConfiguration("input_command_name")),
+            ("~/output/joint_states", LaunchConfiguration("output_joint_state_name"))
         ],
         output='screen',
-        arguments=['--ros-args', '--log-level',
-                   'info', '--enable-stdout-logs'],
+        arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
     )
 
     return [
-        unitree_a1_joystick
+        unitree_a1_legged_node
     ]
 
 
@@ -59,9 +58,12 @@ def generate_launch_description():
             DeclareLaunchArgument(name, default_value=default_value)
         )
 
-    add_launch_arg('unitree_a1_joystick_param_file', '')
-    add_launch_arg("output_cmd_name", "unitree_a1_joystick/cmd_vel")
-    add_launch_arg("input_joy_name", "unitree_a1_joystick/joy")
+    add_launch_arg('unitree_a1_legged_param_file', '')
+    add_launch_arg('output_state_name', 'unitree_a1_legged/cmd_vel')
+    add_launch_arg('input_command_name', 'unitree_a1_legged/joy')
+    add_launch_arg('output_joy_name', 'unitree_a1_legged/cmd_vel')
+    add_launch_arg('output_joint_state_name', 'unitree_a1_legged/joint_states')
+
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)

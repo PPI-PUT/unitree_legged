@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(unitree_a1_legged_msgs)
+project(unitree_a1_description)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -8,32 +8,8 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
-find_package(rosidl_default_generators REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-
-set(msg_files
-    "msg/CommonMotorCmd.msg"
-    "msg/FootForceState.msg"
-    "msg/HighCmd.msg"
-    "msg/HighState.msg"
-    "msg/JointCommand.msg"
-    "msg/LegCmd.msg"
-    "msg/LegState.msg"
-    "msg/LowCmd.msg"
-    "msg/LowState.msg"
-    "msg/MotorCmd.msg"
-    "msg/MotorState.msg"
-    "msg/QuadrupedCmd.msg"
-    "msg/QuadrupedState.msg"
-    "msg/UnitreeHeader.msg"
-)
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${msg_files}
-  DEPENDENCIES std_msgs sensor_msgs geometry_msgs
-)
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -46,5 +22,10 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+install(
+  DIRECTORY config launch meshes rviz xacro urdf test
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_package()

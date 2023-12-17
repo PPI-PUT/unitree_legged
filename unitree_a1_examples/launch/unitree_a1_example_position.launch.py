@@ -1,5 +1,4 @@
 # Copyright 2023 Maciej Krupka
-# Perception for Physical Interaction Laboratory at Poznan University of Technology
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,23 +22,24 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_joystick_param_file').perform(context)
+    param_path = LaunchConfiguration(
+        'unitree_a1_example_position_param_file').perform(context)
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_joystick'), 'config',
-             'unitree_a1_joystick.param.yaml']
+            [FindPackageShare('unitree_a1_examples'), 'config',
+             'unitree_a1_example_position.param.yaml']
         ).perform(context)
 
-    unitree_a1_joystick = Node(
-        package='unitree_a1_joystick',
-        executable='unitree_a1_joystick_node_exe',
-        name='unitree_a1_joystick_node',
+    unitree_a1_examples_node = Node(
+        package='unitree_a1_examples',
+        executable='unitree_a1_examples_position_control_exe',
+        name='unitree_a1_example_position',
         parameters=[
             param_path
         ],
         remappings=[
-            ("~/output/cmd_vel", LaunchConfiguration("output_cmd_name")),
-            ("~/input/joy", LaunchConfiguration("input_joy_name"))
+            ("~/input/state", LaunchConfiguration("input_state_name")),
+            ("~/output/command", LaunchConfiguration("output_command_name"))
         ],
         output='screen',
         arguments=['--ros-args', '--log-level',
@@ -47,7 +47,7 @@ def launch_setup(context, *args, **kwargs):
     )
 
     return [
-        unitree_a1_joystick
+        unitree_a1_examples_node
     ]
 
 
@@ -59,9 +59,9 @@ def generate_launch_description():
             DeclareLaunchArgument(name, default_value=default_value)
         )
 
-    add_launch_arg('unitree_a1_joystick_param_file', '')
-    add_launch_arg("output_cmd_name", "unitree_a1_joystick/cmd_vel")
-    add_launch_arg("input_joy_name", "unitree_a1_joystick/joy")
+    add_launch_arg('unitree_a1_example_position_param_file', '')
+    add_launch_arg('input_state_name', 'unitree_a1_legged/state')
+    add_launch_arg('output_command_name', 'unitree_a1_legged/cmd')
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)
