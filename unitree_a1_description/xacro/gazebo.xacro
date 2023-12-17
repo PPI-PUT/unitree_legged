@@ -3,7 +3,7 @@
     <!-- ros2_control plugin -->
     <gazebo>
         <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-            <parameters>$(find a1_description)/config/robot_controller.yaml</parameters>
+            <parameters>$(find unitree_a1_description)/config/robot_controller.yaml</parameters>
         </plugin>
     </gazebo>
     <!-- Show the trajectory of trunk center. -->

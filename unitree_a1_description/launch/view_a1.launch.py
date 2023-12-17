@@ -28,7 +28,7 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [
-                    FindPackageShare("a1_description"),
+                    FindPackageShare("unitree_a1_description"),
                     "xacro",
                     "robot.xacro",
                 ]
@@ -38,7 +38,7 @@ def generate_launch_description():
     robot_description = {"robot_description": robot_description_content}
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("a1_description"), "rviz", "view_robot.rviz"]
+        [FindPackageShare("unitree_a1_description"), "rviz", "view_robot.rviz"]
     )
 
     joint_state_publisher_node = Node(
@@ -52,7 +52,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         output="both",
         parameters=[robot_description],
-        remappings=[("joint_states", "/unitree_lowlevel/joint_states")]
+        remappings=[("joint_states", "/joint_states")]
     )
 
     rviz_node = Node(

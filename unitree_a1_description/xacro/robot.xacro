@@ -4,12 +4,12 @@
 
     <xacro:arg name="DEBUG" default="false"/>
 
-    <xacro:include filename="$(find a1_description)/xacro/const.xacro"/>
-    <xacro:include filename="$(find a1_description)/xacro/materials.xacro"/>
-    <xacro:include filename="$(find a1_description)/xacro/leg.xacro"/>
+    <xacro:include filename="$(find unitree_a1_description)/xacro/const.xacro"/>
+    <xacro:include filename="$(find unitree_a1_description)/xacro/materials.xacro"/>
+    <xacro:include filename="$(find unitree_a1_description)/xacro/leg.xacro"/>
     <!-- <xacro:include filename="$(find a1_description)/xacro/stairs.xacro"/> -->
-    <xacro:include filename="$(find a1_description)/xacro/gazebo.xacro"/>
-    <xacro:include filename="$(find a1_description)/xacro/ros2_control.xacro"/>
+    <xacro:include filename="$(find unitree_a1_description)/xacro/gazebo.xacro"/>
+    <xacro:include filename="$(find unitree_a1_description)/xacro/ros2_control.xacro"/>
     <!-- <xacro:include filename="$(find a1_gazebo)/launch/stairs.urdf.xacro"/> -->
 
     <!-- <xacro:stairs stairs="15" xpos="0" ypos="0" zpos="0" /> -->
@@ -46,7 +46,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="file://$(find a1_description)/meshes/trunk.dae" scale="1 1 1"/>
+                <mesh filename="file://$(find unitree_a1_description)/meshes/trunk.dae" scale="1 1 1"/>
             </geometry>
             <material name="orange"/>
         </visual>
