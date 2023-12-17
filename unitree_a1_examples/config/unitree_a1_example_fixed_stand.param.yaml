@@ -1,0 +1,9 @@
+/**:
+  ros__parameters:
+    hip_kp: 70.0
+    hip_kd: 3.0
+    thigh_kp: 180.0
+    thigh_kd: 8.0
+    calf_kp: 300.0
+    calf_kd: 15.0
+    steps: 2000.0
