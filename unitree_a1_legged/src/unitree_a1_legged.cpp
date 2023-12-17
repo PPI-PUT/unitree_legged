@@ -1,4 +1,4 @@
-// Copyright 2023 Mobile Robots Laboratory at Poznan University of Technology
+// Copyright 2023 Maciej Krupka
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "unitree_a1_legged/unitree_legged.hpp"
+#include "unitree_a1_legged/unitree_a1_legged.hpp"
 
-using namespace UNITREE_LEGGED_SDK;
+#include <iostream>
 
 namespace unitree_a1_legged
 {
@@ -61,4 +61,4 @@ namespace unitree_a1_legged
         low_udp_.GetRecv(low_state_);
     }
 
-} // namespace unitree_a1_legged
+}  // namespace unitree_a1_legged
