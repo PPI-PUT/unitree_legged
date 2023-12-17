@@ -37,7 +37,7 @@ namespace unitree_a1_legged
 
     // Create publishers
     twist_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("~/output/cmd_vel", 1);
-    // Create subscribers #unitree_lowlevel/joy
+    // Create subscribers
     joystick_subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>("~/input/joy", 1, std::bind(&UnitreeJoystickNode::receiveJoystickCallback, this, std::placeholders::_1));
   }
 

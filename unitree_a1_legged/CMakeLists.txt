@@ -65,17 +65,6 @@ rclcpp_components_register_node(${PROJECT_NAME}_node
   EXECUTABLE ${PROJECT_NAME}_node_exe
 )
 
-# if(BUILD_TESTING)
-#   find_package(ament_lint_auto REQUIRED)
-#   ament_lint_auto_find_test_dependencies()
-
-#   ament_add_ros_isolated_gtest(test_unitree_a1_legged
-#     test/test_unitree_a1_legged.cpp
-#   )
-#   ament_target_dependencies(test_unitree_a1_legged ${TEST_SOURCES})
-#   target_link_libraries(test_unitree_a1_legged ${PROJECT_NAME})
-# endif()
-
 ament_auto_package(INSTALL_TO_SHARE
   launch
   config
