@@ -32,14 +32,14 @@ Before running the Unitree Legged Node, please follow these steps:
 ```
 cd ros2_ws
 source /opt/ros/humble/setup.bash
-ros2 run unitree_a1_legged udp
+ros2 launch unitree_a1_legged unitree_a1_legged.launch.py
 ```
 **Press Enter to continue...**
 
 ## Example
 run on second terminal
 ```
-ros2 run unitree_a1_legged example_position
+ros2 launch unitree_a1_examples unitree_a1_example_position.launch.py
 ```
 
 ## Worth to know 
