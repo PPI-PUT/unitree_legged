@@ -44,7 +44,7 @@ def launch_setup(context, *args, **kwargs):
             "unitree_a1_legged_param_file": unitree_legged_file,
             "output_state_name": "unitree_a1_legged/state",
             "output_joy_name": "unitree_a1_legged/joy",
-            "input_command_name": "unitree_a1_legged/cmd_vel"
+            "input_command_name": "unitree_a1_legged/cmd"
         }.items()
     )
     unitree_legged_joystick_file = PathJoinSubstitution([

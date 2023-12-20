@@ -15,6 +15,8 @@ find_package(geometry_msgs REQUIRED)
 
 set(msg_files
     "msg/CommonMotorCmd.msg"
+    "msg/ControllerType.msg"
+    "msg/ControlMode.msg"
     "msg/FootForceState.msg"
     "msg/HighCmd.msg"
     "msg/HighState.msg"
@@ -28,6 +30,7 @@ set(msg_files
     "msg/QuadrupedCmd.msg"
     "msg/QuadrupedState.msg"
     "msg/UnitreeHeader.msg"
+    "srv/Gait.srv"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
