@@ -54,7 +54,7 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
-      Description File: /home/mackop/ros2_control/src/a1_description/urdf/a1.urdf
+      Description File: /home/mackop/ros2_control/src/unitree_a1_description/urdf/a1.urdf
       Description Source: Topic
       Description Topic:
         Depth: 5

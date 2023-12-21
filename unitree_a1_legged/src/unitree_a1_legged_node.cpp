@@ -70,7 +70,6 @@ void UnitreeLeggedNode::receiveCommandCallback(
   const unitree_a1_legged_msgs::msg::LowCmd::SharedPtr msg)
 {
   // Convert to lowlevel cmd
-  RCLCPP_INFO(this->get_logger(), "Received low command");
   auto low_cmd_once = unitree_.getLowCmd();
   Converter::msgToCmd(msg, low_cmd_once);
   unitree_.sendProtectLowCmd(low_cmd_once, safety_factor_);
@@ -79,7 +78,6 @@ void UnitreeLeggedNode::receiveJointCommandCallback(
   const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg)
 {
   // Convert to lowlevel cmd
-  RCLCPP_INFO(this->get_logger(), "Received joint command");
   auto low_cmd_once = unitree_.getLowCmd();
   Converter::msgToCmd(msg, low_cmd_once);
   unitree_.sendProtectLowCmd(low_cmd_once, safety_factor_);

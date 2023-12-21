@@ -25,8 +25,6 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
-    rviz_cfg_path = PathJoinSubstitution(
-        [FindPackageShare('unitree_a1_legged_launch'), 'rviz/default.rviz'])
     pkg_prefix = FindPackageShare('unitree_a1_legged_launch')
     unitree_legged_file = PathJoinSubstitution([
         pkg_prefix,
@@ -44,13 +42,13 @@ def launch_setup(context, *args, **kwargs):
             "unitree_a1_legged_param_file": unitree_legged_file,
             "output_state_name": "unitree_a1_legged/state",
             "output_joy_name": "unitree_a1_legged/joy",
-            "input_command_name": "unitree_a1_legged/cmd_vel"
+            "input_command_name": "unitree_a1_legged/cmd"
         }.items()
     )
     unitree_legged_joystick_file = PathJoinSubstitution([
         pkg_prefix,
         "config",
-        "unitree_a1_legged.param.yaml"
+        "unitree_a1_joystick.param.yaml"
     ])
     unitree_joystick_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -66,19 +64,50 @@ def launch_setup(context, *args, **kwargs):
 
         }.items()
     )
+    state_machine = PathJoinSubstitution([
+        pkg_prefix,
+        "config",
+        "unitree_a1_state_machine.param.yaml"
+    ])
+    state_machine_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            launch_file_path=PathJoinSubstitution([
+                FindPackageShare(
+                    'unitree_a1_state_machine'), 'launch', 'unitree_a1_state_machine.launch.py'
+            ]),
+        ),
+        launch_arguments={
+            "unitree_a1_state_machine_param_file": state_machine,
+            "service_stand_name": "/unitree_a1_legged/fixed_stand",
 
-    rviz2 = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', str(rviz_cfg_path.perform(context))],
-        condition=IfCondition(LaunchConfiguration('with_rviz'))
+        }.items()
+    )
+    stand_action = PathJoinSubstitution([
+        pkg_prefix,
+        "config",
+        "unitree_a1_fixed_stand_server.param.yaml"
+    ])
+    stand_action_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            launch_file_path=PathJoinSubstitution([
+                FindPackageShare(
+                    'unitree_a1_fixed_stand_server'), 'launch', 'unitree_a1_fixed_stand_server.launch.py'
+            ]),
+        ),
+        launch_arguments={
+            "unitree_a1_state_machine_param_file": stand_action,
+            "output_cmd_name": "/unitree_a1_legged/fixed_stand/cmd",
+            "input_state_name": "/unitree_a1_legged/state",
+            "service_stand_name": "/unitree_a1_legged/stand",
+
+        }.items()
     )
 
     return [
-        rviz2,
         unitree_legged_launch,
-        unitree_joystick_launch
+        unitree_joystick_launch,
+        state_machine_launch,
+        stand_action_launch
     ]
 
 

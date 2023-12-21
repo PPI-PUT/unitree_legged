@@ -29,6 +29,8 @@ namespace unitree_a1_legged
         float linear_x() { return ly(); }
         float linear_y() { return lx(); }
         float angular_z() { return rx(); }
+        bool stand() { return A(); }
+        bool neural() { return B(); }
 
     private:
         const sensor_msgs::msg::Joy j_;
