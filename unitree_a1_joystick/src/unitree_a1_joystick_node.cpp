@@ -46,6 +46,8 @@ UnitreeJoystickNode::UnitreeJoystickNode(const rclcpp::NodeOptions & options)
     "~/input/joy", 1, std::bind(
       &UnitreeJoystickNode::receiveJoystickCallback, this,
       std::placeholders::_1));
+  client_gait_ = this->create_client<unitree_a1_legged_msgs::srv::Gait>(
+    "/unitree_a1_state_machine_node/gait");
 }
 
 void UnitreeJoystickNode::receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg)
@@ -57,6 +59,7 @@ void UnitreeJoystickNode::receiveJoystickCallback(const sensor_msgs::msg::Joy::S
 void UnitreeJoystickNode::publishTwist()
 {
   auto twist_msg = geometry_msgs::msg::TwistStamped();
+  twist_msg.header.frame_id = "base";
   twist_msg.header.stamp = this->now();
   if (joy_->linear_x()) {
     twist_msg.twist.linear.x =
@@ -81,7 +84,6 @@ void UnitreeJoystickNode::indexButtonCallback()
   rclcpp::Time now = this->get_clock()->now();
 
   if (joy_->stand()) {
-    RCLCPP_INFO(get_logger(), "going Stand");
     button_hold_duration_ = button_hold_duration_ + (now - last_time_button_pressed_);
   } else {
     button_hold_duration_ = rclcpp::Duration(0, 0);
@@ -90,7 +92,7 @@ void UnitreeJoystickNode::indexButtonCallback()
     RCLCPP_INFO(get_logger(), "Stand");
     auto request = std::make_shared<unitree_a1_legged_msgs::srv::Gait::Request>();
     auto msg = unitree_a1_legged_msgs::msg::ControllerType();
-    msg.type = 1;
+    msg.type = 3;
     request->method = msg; //unitree_a1_legged_msgs::msg::ControllerType::FIXED_STAND;
     client_gait_->async_send_request(request);
     button_hold_duration_ = rclcpp::Duration(0, 0);
