@@ -7,7 +7,7 @@
     <xacro:include filename="$(find unitree_a1_description)/xacro/const.xacro"/>
     <xacro:include filename="$(find unitree_a1_description)/xacro/materials.xacro"/>
     <xacro:include filename="$(find unitree_a1_description)/xacro/leg.xacro"/>
-    <!-- <xacro:include filename="$(find a1_description)/xacro/stairs.xacro"/> -->
+    <!-- <xacro:include filename="$(find unitree_a1_description)/xacro/stairs.xacro"/> -->
     <xacro:include filename="$(find unitree_a1_description)/xacro/gazebo.xacro"/>
     <xacro:include filename="$(find unitree_a1_description)/xacro/ros2_control.xacro"/>
     <!-- <xacro:include filename="$(find a1_gazebo)/launch/stairs.urdf.xacro"/> -->

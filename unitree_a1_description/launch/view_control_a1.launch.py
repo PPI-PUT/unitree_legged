@@ -17,7 +17,7 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [
-                    FindPackageShare("a1_description"),
+                    FindPackageShare("unitree_a1_description"),
                     "xacro",
                     "robot.xacro",
                 ]
@@ -27,7 +27,7 @@ def generate_launch_description():
     robot_description = {"robot_description": robot_description_content}
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("a1_description"), "rviz", "view_robot.rviz"]
+        [FindPackageShare("unitree_a1_description"), "rviz", "view_robot.rviz"]
     )
 
     robot_state_publisher_node = Node(
