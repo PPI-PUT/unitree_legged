@@ -31,6 +31,7 @@ set(msg_files
     "msg/QuadrupedState.msg"
     "msg/UnitreeHeader.msg"
     "srv/Gait.srv"
+    "action/FixedStand.action"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
