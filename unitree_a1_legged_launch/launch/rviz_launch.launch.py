@@ -40,11 +40,12 @@ def launch_setup(context, *args, **kwargs):
     robot_description = {"robot_description": robot_description_content}
 
     robot_state_publisher_node = Node(
+        name='a1',
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
         parameters=[robot_description],
-        remappings=[("joint_states", LaunchConfiguration("joint_states_name"))]
+        remappings=[("joint_states", LaunchConfiguration("joint_control_states_name"))]
     )
     rviz_config_file = PathJoinSubstitution(
         [FindPackageShare("unitree_a1_description"), "rviz", "view_robot.rviz"]
@@ -74,6 +75,8 @@ def generate_launch_description():
 
     add_launch_arg('with_rviz', 'False')
     add_launch_arg('joint_states_name', 'unitree_a1_legged/joint_states')
+    add_launch_arg('joint_control_states_name',
+                   '/unitree_a1_state_machine_node/output/nn/joint_states')
 
     return LaunchDescription([
         *declared_arguments,
