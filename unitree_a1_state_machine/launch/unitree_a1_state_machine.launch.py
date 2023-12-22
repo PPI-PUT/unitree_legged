@@ -21,13 +21,21 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
+def action_remap(name: str, remap: LaunchConfiguration, context):
+    remap_str = remap.perform(context)
+    return [(f'{name}/_action/{var}', f'{remap_str}/_action/{var}')
+            for var in
+            ['feedback', 'status', 'cancel_goal', 'get_result', 'send_goal']]
+
+
 def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_state_machine_param_file').perform(context)
+    param_path = LaunchConfiguration(
+        'unitree_a1_state_machine_param_file').perform(context)
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_state_machine'), 'config', 'unitree_a1_state_machine.param.yaml']
+            [FindPackageShare('unitree_a1_state_machine'),
+             'config', 'unitree_a1_state_machine.param.yaml']
         ).perform(context)
-
     unitree_a1_state_machine_node = Node(
         package='unitree_a1_state_machine',
         executable='unitree_a1_state_machine_node_exe',
@@ -39,9 +47,11 @@ def launch_setup(context, *args, **kwargs):
             ("~/input/walk", LaunchConfiguration("input_walk_name")),
             ("~/input/stand", LaunchConfiguration("input_stand_name")),
             ("~/output/cmd", LaunchConfiguration("output_command_name")),
-        ],
+            ("~/service/gait", LaunchConfiguration("service_gait_name")),
+        ] + action_remap('~/action/fixed_stand', LaunchConfiguration("service_stand_name"), context),
         output='screen',
-        arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
+        arguments=['--ros-args', '--log-level',
+                   'info', '--enable-stdout-logs'],
     )
 
     return [
@@ -61,6 +71,9 @@ def generate_launch_description():
     add_launch_arg('input_walk_name', '/unitree_a1_legged/nn/cmd')
     add_launch_arg('input_stand_name', '/unitree_a1_legged/fixed_stand/cmd')
     add_launch_arg('output_command_name', '/unitree_a1_legged/cmd')
+    add_launch_arg('service_gait_name', '/unitree_a1_legged/gait')
+    add_launch_arg('service_stand_name', '/unitree_a1_legged/stand')
+
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)

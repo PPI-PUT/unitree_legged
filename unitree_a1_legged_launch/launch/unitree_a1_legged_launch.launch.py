@@ -23,6 +23,19 @@ from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
 
+def action_remap(name: str, remap: LaunchConfiguration, context):
+    return [
+        (f'{name}/_action/feedback',
+         f'{remap.perform(context)}/_action/feedback'),
+        (f'{name}/_action/status',
+         f'{remap.perform(context)}/_action/status'),
+        (f'{name}/_action/cancel_goal',
+         f'{remap.perform(context)}/_action/cancel_goal'),
+        (f'{name}/_action/get_result',
+         f'{remap.perform(context)}/_action/get_result'),
+        (f'{name}/_action/send_goal',
+         f'{remap.perform(context)}/_action/send_goal'),
+    ]
 
 def launch_setup(context, *args, **kwargs):
     pkg_prefix = FindPackageShare('unitree_a1_legged_launch')
@@ -78,7 +91,7 @@ def launch_setup(context, *args, **kwargs):
         ),
         launch_arguments={
             "unitree_a1_state_machine_param_file": state_machine,
-            "service_stand_name": "/unitree_a1_legged/fixed_stand",
+            "service_stand_name": "/unitree_a1_legged/stand",
 
         }.items()
     )
@@ -99,7 +112,7 @@ def launch_setup(context, *args, **kwargs):
             "output_cmd_name": "/unitree_a1_legged/fixed_stand/cmd",
             "input_state_name": "/unitree_a1_legged/state",
             "service_stand_name": "/unitree_a1_legged/stand",
-
+            
         }.items()
     )
 

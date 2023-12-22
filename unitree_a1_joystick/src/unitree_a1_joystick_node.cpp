@@ -47,7 +47,7 @@ UnitreeJoystickNode::UnitreeJoystickNode(const rclcpp::NodeOptions & options)
       &UnitreeJoystickNode::receiveJoystickCallback, this,
       std::placeholders::_1));
   client_gait_ = this->create_client<unitree_a1_legged_msgs::srv::Gait>(
-    "/unitree_a1_state_machine_node/gait");
+    "~/service/gait");
 }
 
 void UnitreeJoystickNode::receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg)

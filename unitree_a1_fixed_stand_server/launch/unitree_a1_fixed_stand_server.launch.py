@@ -21,6 +21,13 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
+def action_remap(name: str, remap: LaunchConfiguration, context):
+    remap_str = remap.perform(context)
+    return [(f'{name}/_action/{var}', f'{remap_str}/_action/{var}')
+            for var in
+            ['feedback', 'status', 'cancel_goal', 'get_result', 'send_goal']]
+
+
 def launch_setup(context, *args, **kwargs):
     param_path = LaunchConfiguration(
         'unitree_a1_fixed_stand_server_param_file').perform(context)
@@ -40,8 +47,7 @@ def launch_setup(context, *args, **kwargs):
         remappings=[
             ("~/output/cmd", LaunchConfiguration("output_cmd_name")),
             ("~/input/state", LaunchConfiguration("input_state_name")),
-            ("/fixed_stand", LaunchConfiguration("service_stand_name")),
-        ],
+        ] + action_remap('~/action/fixed_stand', LaunchConfiguration("service_stand_name"), context),
         output='screen',
         arguments=['--ros-args', '--log-level',
                    'info', '--enable-stdout-logs'],
