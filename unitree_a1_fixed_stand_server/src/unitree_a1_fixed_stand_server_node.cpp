@@ -33,7 +33,7 @@ UnitreeFixedStandServerNode::UnitreeFixedStandServerNode(const rclcpp::NodeOptio
     std::make_unique<unitree_a1_fixed_stand_server::UnitreeFixedStandServer>();
   fixed_stand_server_ = rclcpp_action::create_server<FixedStand>(
     this,
-    "~/fixed_stand",
+    "~/action/fixed_stand",
     std::bind(
       &UnitreeFixedStandServerNode::handleFixedStandGoal, this, _1, _2),
     std::bind(

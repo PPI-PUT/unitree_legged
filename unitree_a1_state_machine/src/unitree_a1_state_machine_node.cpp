@@ -37,12 +37,12 @@ UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & opt
     std::chrono::milliseconds(20),
     std::bind(&UnitreeStateMachineNode::controlLoop, this));
   server_gait_ = this->create_service<Gait>(
-    "~/gait",
+    "~/service/gait",
     std::bind(
       &UnitreeStateMachineNode::handleGait, this, _1, _2));
   fixed_stand_client_ = rclcpp_action::create_client<FixedStand>(
     this,
-    "/unitree_a1_fixed_stand_server_node/fixed_stand");
+    "~/action/fixed_stand");
 }
 void UnitreeStateMachineNode::controlLoop()
 {
