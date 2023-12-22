@@ -39,7 +39,8 @@ def launch_setup(context, *args, **kwargs):
             ("~/output/state", LaunchConfiguration("output_state_name")),
             ("~/output/joy", LaunchConfiguration("output_joy_name")),
             ("~/input/command", LaunchConfiguration("input_command_name")),
-            ("~/output/joint_states", LaunchConfiguration("output_joint_state_name"))
+            ("~/output/joint_states", LaunchConfiguration("output_joint_state_name")),
+            ("~/output/imu", LaunchConfiguration("output_imu_name")),
         ],
         output='screen',
         arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
@@ -63,6 +64,7 @@ def generate_launch_description():
     add_launch_arg('input_command_name', 'unitree_a1_legged/joy')
     add_launch_arg('output_joy_name', 'unitree_a1_legged/cmd_vel')
     add_launch_arg('output_joint_state_name', 'unitree_a1_legged/joint_states')
+    add_launch_arg('output_imu_name', 'unitree_a1_legged/imu')
 
     return LaunchDescription([
         *declared_arguments,

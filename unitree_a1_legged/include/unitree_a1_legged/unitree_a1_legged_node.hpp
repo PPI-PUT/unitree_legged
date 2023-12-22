@@ -44,6 +44,7 @@ private:
     quadruped_command__subscriber_;
   rclcpp::Publisher<unitree_a1_legged_msgs::msg::LowState>::SharedPtr state_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;
+  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_publisher_;
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr joystick_publisher_;
   rclcpp::Subscription<unitree_a1_legged_msgs::msg::JointCommand>::SharedPtr joint_state_subscriber_;
   void updateLoop();

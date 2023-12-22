@@ -41,6 +41,7 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
   joint_state_publisher_ =
     this->create_publisher<sensor_msgs::msg::JointState>("~/output/joint_states", 1);
   joystick_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>("~/output/joy", 1);
+  imu_publisher_ = this->create_publisher<sensor_msgs::msg::Imu>("~/output/imu", 1);
   joint_state_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::JointCommand>(
     "~/input/joint_command", 1,
     std::bind(&UnitreeLeggedNode::receiveJointCommandCallback, this, std::placeholders::_1));
@@ -99,6 +100,10 @@ void UnitreeLeggedNode::updateStateCallback()
   auto joy_msg = Converter::stateToMsg(unitree_.getLowState().wirelessRemote);
   joy_msg.header.stamp = stamp;
   joystick_publisher_->publish(joy_msg);
+  // Convert to imu msgs
+  auto imu_msg = Converter::stateToMsg(unitree_.getLowState().imu);
+  imu_msg.header.stamp = stamp;
+  imu_publisher_->publish(imu_msg);
 }
 
 }  // namespace unitree_a1_legged

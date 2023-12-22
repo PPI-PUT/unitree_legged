@@ -47,10 +47,10 @@ namespace unitree_a1_legged
         msg.foot_force = Converter::stateToMsg(state.footForce);
         msg.foot_force_est = Converter::stateToMsg(state.footForceEst);
         msg.tick = state.tick;
-        for (int i = 0; i < 40; i++)
-        {
-            msg.wireless_remote[i] = state.wirelessRemote[i];
-        }
+        // for (int i = 0; i < 40; i++)
+        // {
+        //     msg.wireless_remote[i] = state.wirelessRemote[i];
+        // }
         msg.reserve = state.reserve;
         msg.crc = state.crc;
         return msg;
