@@ -63,7 +63,7 @@ def generate_launch_description():
     add_launch_arg('unitree_a1_joystick_param_file', '')
     add_launch_arg("output_cmd_name", "unitree_a1_joystick/cmd_vel")
     add_launch_arg("input_joy_name", "unitree_a1_joystick/joy")
-    add_launch_arg("service_gait_name", "unitree_a1_gait/gait")
+    add_launch_arg("service_gait_name", "unitree_a1_joystick/gait")
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)

@@ -14,8 +14,47 @@
 
 #include "unitree_a1_state_machine/unitree_a1_state_machine_node.hpp"
 
+constexpr double a1_Hip_max = 0.802;          // unit:radian ( = 46   degree)
+constexpr double a1_Hip_min = -0.802;         // unit:radian ( = -46  degree)
+constexpr double a1_Thigh_max = 4.19;         // unit:radian ( = 240  degree)
+constexpr double a1_Thigh_min = -1.05;        // unit:radian ( = -60  degree)
+constexpr double a1_Calf_max = -0.916;        // unit:radian ( = -52.5  degree)
+constexpr double a1_Calf_min = -2.7;          // unit:radian ( = -154.5 degree)
+
+
 namespace unitree_a1_state_machine
 {
+bool check_safety_position(LowCmd & cmd)
+{
+  if (a1_Thigh_max < cmd.motor_cmd.front_right.thigh.q ||
+    a1_Thigh_min > cmd.motor_cmd.front_right.thigh.q ||
+    a1_Thigh_max < cmd.motor_cmd.front_left.thigh.q ||
+    a1_Thigh_min > cmd.motor_cmd.front_left.thigh.q ||
+    a1_Thigh_max < cmd.motor_cmd.rear_right.thigh.q ||
+    a1_Thigh_min > cmd.motor_cmd.rear_right.thigh.q ||
+    a1_Thigh_max < cmd.motor_cmd.rear_left.thigh.q ||
+    a1_Thigh_min > cmd.motor_cmd.rear_left.thigh.q ||
+    a1_Calf_max < cmd.motor_cmd.front_right.calf.q ||
+    a1_Calf_min > cmd.motor_cmd.front_right.calf.q ||
+    a1_Calf_max < cmd.motor_cmd.front_left.calf.q ||
+    a1_Calf_min > cmd.motor_cmd.front_left.calf.q ||
+    a1_Calf_max < cmd.motor_cmd.rear_right.calf.q ||
+    a1_Calf_min > cmd.motor_cmd.rear_right.calf.q ||
+    a1_Calf_max < cmd.motor_cmd.rear_left.calf.q ||
+    a1_Calf_min > cmd.motor_cmd.rear_left.calf.q ||
+    a1_Hip_max < cmd.motor_cmd.front_right.hip.q ||
+    a1_Hip_min > cmd.motor_cmd.front_right.hip.q ||
+    a1_Hip_max < cmd.motor_cmd.front_left.hip.q ||
+    a1_Hip_min > cmd.motor_cmd.front_left.hip.q ||
+    a1_Hip_max < cmd.motor_cmd.rear_right.hip.q ||
+    a1_Hip_min > cmd.motor_cmd.rear_right.hip.q ||
+    a1_Hip_max < cmd.motor_cmd.rear_left.hip.q ||
+    a1_Hip_min > cmd.motor_cmd.rear_left.hip.q)
+  {
+    return false;
+  }
+  return true;
+}
 
 UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & options)
 :  Node("unitree_a1_state_machine", options)
@@ -47,10 +86,15 @@ UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & opt
 void UnitreeStateMachineNode::controlLoop()
 {
   auto state = unitree_a1_state_machine_->getState();
+  RCLCPP_INFO(this->get_logger(), "State: %d", static_cast<int>(state));
   if (state == unitree_a1_state_machine::State::STAND) {
     pub_cmd_->publish(*stand_cmd_msg_);
   } else if (state == unitree_a1_state_machine::State::WALK) {
-    pub_cmd_->publish(*walk_cmd_msg_);
+    if (check_safety_position(*walk_cmd_msg_)) {
+      pub_cmd_->publish(*walk_cmd_msg_);
+    }else {
+      RCLCPP_WARN(this->get_logger(), "Safety position error");
+    }
   } else if (state == unitree_a1_state_machine::State::HOLD) {
     pub_cmd_->publish(*stand_cmd_msg_);
   }
@@ -120,8 +164,9 @@ void UnitreeStateMachineNode::handleGait(
         if (unitree_a1_state_machine_->getState() == unitree_a1_state_machine::State::UNKNOWN) {
           unitree_a1_state_machine_->nextState(); // skip UNKNOWN state
           unitree_a1_state_machine_->nextState(); // skip STOP state
+          RCLCPP_INFO(this->get_logger(), "SKIP UNKNOWN AND STOP STATE");
         } else {return;}
-
+        unitree_a1_state_machine_->nextState();
         RCLCPP_INFO(this->get_logger(), "STAND");
         if (!fixed_stand_client_->wait_for_action_server(std::chrono::milliseconds(500))) {
           RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");

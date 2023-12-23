@@ -55,6 +55,7 @@ def launch_setup(context, *args, **kwargs):
             "unitree_a1_legged_param_file": unitree_legged_file,
             "output_state_name": "unitree_a1_legged/state",
             "output_joy_name": "unitree_a1_legged/joy",
+
             "input_command_name": "unitree_a1_legged/cmd"
         }.items()
     )
@@ -73,7 +74,8 @@ def launch_setup(context, *args, **kwargs):
         launch_arguments={
             "unitree_a1_joystick_param_file": unitree_legged_joystick_file,
             "output_cmd_name": "unitree_a1_legged/cmd_vel",
-            "input_joy_name": "unitree_a1_legged/joy"
+            "input_joy_name": "unitree_a1_legged/joy",
+            "service_gait_name": "unitree_a1_legged/gait"
 
         }.items()
     )
@@ -92,7 +94,10 @@ def launch_setup(context, *args, **kwargs):
         launch_arguments={
             "unitree_a1_state_machine_param_file": state_machine,
             "service_stand_name": "/unitree_a1_legged/stand",
-
+            "service_gait_name": "/unitree_a1_legged/gait",
+            "output_command_name": "/unitree_a1_legged/cmd",
+            "input_walk_name": "/unitree_a1_legged/nn/cmd",
+            "input_stand_name": "/unitree_a1_legged/fixed_stand/cmd",
         }.items()
     )
     stand_action = PathJoinSubstitution([
@@ -115,12 +120,32 @@ def launch_setup(context, *args, **kwargs):
             
         }.items()
     )
-
+    neural_control = PathJoinSubstitution([
+        pkg_prefix,
+        "config",
+        "unitree_a1_neural_control.param.yaml"
+    ])
+    neural_control_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            launch_file_path=PathJoinSubstitution([
+                FindPackageShare(
+                    'unitree_a1_neural_control'), 'launch', 'unitree_a1_neural_control.launch.py'
+            ]),
+        ),
+        launch_arguments={
+            "unitree_a1_neural_control_param_file": neural_control,
+            "output_cmd_name": "/unitree_a1_legged/nn/cmd",
+            "input_state_name": "/unitree_a1_legged/state",
+            "service_gait_name": "/unitree_a1_legged/gait",
+            
+        }.items()
+    )
     return [
         unitree_legged_launch,
         unitree_joystick_launch,
         state_machine_launch,
-        stand_action_launch
+        stand_action_launch,
+        neural_control_launch
     ]
 
 
