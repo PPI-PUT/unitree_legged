@@ -21,6 +21,7 @@
 #include "unitree_a1_legged_msgs/msg/controller_type.hpp"
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <memory>
+#include <tuple>
 #include <rclcpp/rclcpp.hpp>
 
 double calcMappingdouble(const double input, const double sensitivity)
@@ -43,13 +44,20 @@ private:
   double update_rate_;
   double linear_ratio_;
   double angular_ratio_;
+  double linear_x_velocity_;
   double linear_x_sensitivity_;
   double linear_y_sensitivity_;
   double linear_velocity_limit_;
   double angular_z_sensitivity_;
   double angular_velocity_limit_;
+  double velocity_increment_;
+  int joy_or_dir_button_;
   rclcpp::Duration button_hold_duration_ = rclcpp::Duration(0, 0);
+  rclcpp::Duration dir_button_hold_duration_ = rclcpp::Duration(0, 0);
+  rclcpp::Duration button_hold_deadzone_ = rclcpp::Duration(0, 0);
+  rclcpp::Duration dir_button_hold_deadzone_ = rclcpp::Duration(0, 0);
   rclcpp::Time last_time_button_pressed_;
+  rclcpp::Time last_time_dir_button_pressed_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_publisher_;
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joystick_subscriber_;
@@ -59,8 +67,10 @@ private:
   void receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg);
   void publishTwist();
   void indexButtonCallback();
+  int directionalButtons();
   void timerCallback();
   bool isDataReady();
+  std::tuple<int32_t, uint32_t> getDurationTime(double duration);
 };
 } // namespace unitree_a1_legged
 

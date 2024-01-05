@@ -31,6 +31,8 @@ namespace unitree_a1_legged
         float angular_z() { return rx(); }
         bool stand() { return A(); }
         bool neural() { return B(); }
+        bool increase_speed() { return up(); }
+        bool decrease_speed() { return down(); }
 
     private:
         const sensor_msgs::msg::Joy j_;
