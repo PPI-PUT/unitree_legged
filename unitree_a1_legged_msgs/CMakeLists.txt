@@ -17,6 +17,7 @@ set(msg_files
     "msg/CommonMotorCmd.msg"
     "msg/ControllerType.msg"
     "msg/ControlMode.msg"
+    "msg/DebugDoubleArray.msg"
     "msg/FootForceState.msg"
     "msg/HighCmd.msg"
     "msg/HighState.msg"
