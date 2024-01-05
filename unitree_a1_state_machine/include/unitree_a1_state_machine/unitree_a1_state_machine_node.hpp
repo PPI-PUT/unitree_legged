@@ -20,6 +20,7 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "unitree_a1_state_machine/unitree_a1_state_machine.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include <std_srvs/srv/trigger.hpp>
 
 namespace unitree_a1_state_machine
 {
@@ -28,6 +29,7 @@ using FixedStand = unitree_a1_legged_msgs::action::FixedStand;
 using FixedStandGoal = rclcpp_action::ClientGoalHandle<FixedStand>;
 using Gait = unitree_a1_legged_msgs::srv::Gait;
 using LowCmd = unitree_a1_legged_msgs::msg::LowCmd;
+using Trigger = std_srvs::srv::Trigger;
 using namespace std::placeholders;
 
 class UNITREE_A1_STATE_MACHINE_PUBLIC UnitreeStateMachineNode : public rclcpp::Node
@@ -53,6 +55,7 @@ private:
   void handleGait(
     const std::shared_ptr<Gait::Request> request,
     std::shared_ptr<Gait::Response> response);
+  rclcpp::Client<Trigger>::SharedPtr client_reset_controller_;
 };
 }  // namespace unitree_a1_state_machine
 

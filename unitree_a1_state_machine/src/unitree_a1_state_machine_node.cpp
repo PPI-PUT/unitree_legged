@@ -82,11 +82,11 @@ UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & opt
   fixed_stand_client_ = rclcpp_action::create_client<FixedStand>(
     this,
     "~/action/fixed_stand");
+  client_reset_controller_ = this->create_client<Trigger>("~/service/reset_controller");
 }
 void UnitreeStateMachineNode::controlLoop()
 {
   auto state = unitree_a1_state_machine_->getState();
-  RCLCPP_INFO(this->get_logger(), "State: %d", static_cast<int>(state));
   if (state == unitree_a1_state_machine::State::STAND) {
     pub_cmd_->publish(*stand_cmd_msg_);
   } else if (state == unitree_a1_state_machine::State::WALK) {
@@ -105,7 +105,8 @@ void UnitreeStateMachineNode::controlLoop()
   joints.name = {"FR_hip_joint", "FR_thigh_joint", "FR_calf_joint", "FL_hip_joint",
     "FL_thigh_joint", "FL_calf_joint", "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint",
     "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint"};
-  joints.position = {walk_cmd_msg_->motor_cmd.front_right.hip.q,
+  joints.position = {
+    walk_cmd_msg_->motor_cmd.front_right.hip.q,
     walk_cmd_msg_->motor_cmd.front_right.thigh.q,
     walk_cmd_msg_->motor_cmd.front_right.calf.q,
     walk_cmd_msg_->motor_cmd.front_left.hip.q,
@@ -132,7 +133,8 @@ void UnitreeStateMachineNode::resultCallback(const FixedStandGoal::WrappedResult
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      unitree_a1_state_machine_->nextState();
+      client_reset_controller_->async_send_request(
+        std::make_shared<Trigger::Request>());
       break;
     case rclcpp_action::ResultCode::ABORTED:
       RCLCPP_INFO(this->get_logger(), "Goal was aborted");
@@ -183,6 +185,7 @@ void UnitreeStateMachineNode::handleGait(
       } break;
     case 4:
       {
+        unitree_a1_state_machine_->nextState();
         RCLCPP_INFO(this->get_logger(), "Walk");
       } break;
     default:

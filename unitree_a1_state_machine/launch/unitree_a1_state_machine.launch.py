@@ -48,7 +48,10 @@ def launch_setup(context, *args, **kwargs):
             ("~/input/stand", LaunchConfiguration("input_stand_name")),
             ("~/output/cmd", LaunchConfiguration("output_command_name")),
             ("~/service/gait", LaunchConfiguration("service_gait_name")),
-        ] + action_remap('~/action/fixed_stand', LaunchConfiguration("service_stand_name"), context),
+            ("~/service/reset_controller",
+             LaunchConfiguration("service_reset_name"))
+        ] + action_remap('~/action/fixed_stand',
+                         LaunchConfiguration("service_stand_name"), context),
         output='screen',
         arguments=['--ros-args', '--log-level',
                    'info', '--enable-stdout-logs'],
@@ -73,7 +76,7 @@ def generate_launch_description():
     add_launch_arg('output_command_name', '/unitree_a1_legged/cmd')
     add_launch_arg('service_gait_name', '/unitree_a1_legged/gait')
     add_launch_arg('service_stand_name', '/unitree_a1_legged/stand')
-
+    add_launch_arg('service_reset_name', '/unitree_a1_legged/service/reset')
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)

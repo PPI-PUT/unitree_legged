@@ -23,6 +23,7 @@ from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
 
+
 def action_remap(name: str, remap: LaunchConfiguration, context):
     return [
         (f'{name}/_action/feedback',
@@ -36,6 +37,7 @@ def action_remap(name: str, remap: LaunchConfiguration, context):
         (f'{name}/_action/send_goal',
          f'{remap.perform(context)}/_action/send_goal'),
     ]
+
 
 def launch_setup(context, *args, **kwargs):
     pkg_prefix = FindPackageShare('unitree_a1_legged_launch')
@@ -54,9 +56,10 @@ def launch_setup(context, *args, **kwargs):
         launch_arguments={
             "unitree_a1_legged_param_file": unitree_legged_file,
             "output_state_name": "unitree_a1_legged/state",
+            "input_command_name": "unitree_a1_legged/cmd",
             "output_joy_name": "unitree_a1_legged/joy",
-
-            "input_command_name": "unitree_a1_legged/cmd"
+            "output_joint_state_name": "unitree_a1_legged/joint_states",
+            "output_imu_name": "unitree_a1_legged/imu",
         }.items()
     )
     unitree_legged_joystick_file = PathJoinSubstitution([
@@ -93,11 +96,12 @@ def launch_setup(context, *args, **kwargs):
         ),
         launch_arguments={
             "unitree_a1_state_machine_param_file": state_machine,
-            "service_stand_name": "/unitree_a1_legged/stand",
-            "service_gait_name": "/unitree_a1_legged/gait",
-            "output_command_name": "/unitree_a1_legged/cmd",
             "input_walk_name": "/unitree_a1_legged/nn/cmd",
             "input_stand_name": "/unitree_a1_legged/fixed_stand/cmd",
+            "output_command_name": "/unitree_a1_legged/cmd",
+            "service_gait_name": "/unitree_a1_legged/gait",
+            "service_stand_name": "/unitree_a1_legged/stand",
+            "service_reset_name": "/unitree_a1_legged/nn/reset_controller",
         }.items()
     )
     stand_action = PathJoinSubstitution([
@@ -117,7 +121,7 @@ def launch_setup(context, *args, **kwargs):
             "output_cmd_name": "/unitree_a1_legged/fixed_stand/cmd",
             "input_state_name": "/unitree_a1_legged/state",
             "service_stand_name": "/unitree_a1_legged/stand",
-            
+
         }.items()
     )
     neural_control = PathJoinSubstitution([
@@ -134,10 +138,11 @@ def launch_setup(context, *args, **kwargs):
         ),
         launch_arguments={
             "unitree_a1_neural_control_param_file": neural_control,
-            "output_cmd_name": "/unitree_a1_legged/nn/cmd",
             "input_state_name": "/unitree_a1_legged/state",
-            "service_gait_name": "/unitree_a1_legged/gait",
-            
+            "output_cmd_name": "/unitree_a1_legged/nn/cmd",
+            "input_cmd_vel_name": "/unitree_a1_legged/cmd_vel",
+            "service_reset_name": "/unitree_a1_legged/nn/reset_controller",
+
         }.items()
     )
     return [
