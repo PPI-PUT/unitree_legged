@@ -25,19 +25,21 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
   safety_factor_ = this->declare_parameter("safety_factor", 1);
   safety_factor_ = this->get_parameter("safety_factor").as_int();
   if (hot_start) {
-    RCLCPP_INFO(this->get_logger(), "Starting Unitree Legged Node");
-    RCLCPP_INFO(
+    RCLCPP_WARN(this->get_logger(), "Starting Unitree Legged Node");
+    RCLCPP_WARN(
       this->get_logger(),
       "Make sure the robot is lied on the ground and the motors are turned on.");
-    RCLCPP_INFO(this->get_logger(), "Press L1 and hold A to sit down the robot.");
-    RCLCPP_INFO(this->get_logger(), "Press L1+L2 and A to turn on joint control mode.");
-    RCLCPP_INFO(this->get_logger(), "Press Enter to continue...");
+    RCLCPP_WARN(this->get_logger(), "Press L1 and hold A to sit down the robot.");
+    RCLCPP_WARN(this->get_logger(), "Press L1+L2 and A to turn on joint control mode.");
+    RCLCPP_WARN(this->get_logger(), "Press Enter to continue...");
     std::cin.get();
   }
   // Init motor Mode
   unitree_.setMotorMode(PMSM_SERVO_MODE);
   // state_thread_ = std::thread(std::bind(&UnitreeLeggedNode::updateLoop, this));
-  state_publisher_ = this->create_publisher<unitree_a1_legged_msgs::msg::LowState>("~/output/state", 1);
+  state_publisher_ = this->create_publisher<unitree_a1_legged_msgs::msg::LowState>(
+    "~/output/state",
+    1);
   joint_state_publisher_ =
     this->create_publisher<sensor_msgs::msg::JointState>("~/output/joint_states", 1);
   joystick_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>("~/output/joy", 1);
@@ -49,6 +51,14 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
     "~/input/command", 1,
     std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
   timer_ = this->create_wall_timer(2ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
+  foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/fr_contact", 1);
+  foot_force_fl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/fl_contact", 1);
+  foot_force_rr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/rr_contact", 1);
+  foot_force_rl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/rl_contact", 1);
 }
 UnitreeLeggedNode::~UnitreeLeggedNode()
 {
@@ -104,6 +114,17 @@ void UnitreeLeggedNode::updateStateCallback()
   auto imu_msg = Converter::stateToMsg(unitree_.getLowState().imu);
   imu_msg.header.stamp = stamp;
   imu_publisher_->publish(imu_msg);
+  // Convert to foot force msgs
+  geometry_msgs::msg::WrenchStamped fr_msg, fl_msg, rr_msg, rl_msg;
+  fr_msg.header.stamp = stamp;
+  fl_msg.header.stamp = stamp;
+  rr_msg.header.stamp = stamp;
+  rl_msg.header.stamp = stamp;
+  Converter::getWrenchMsg(unitree_.getLowState().footForce, fr_msg, fl_msg, rr_msg, rl_msg);
+  foot_force_fr_publisher_->publish(fr_msg);
+  foot_force_fl_publisher_->publish(fl_msg);
+  foot_force_rr_publisher_->publish(rr_msg);
+  foot_force_rl_publisher_->publish(rl_msg);
 }
 
 }  // namespace unitree_a1_legged

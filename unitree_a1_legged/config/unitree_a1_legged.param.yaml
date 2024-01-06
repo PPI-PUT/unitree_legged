@@ -1,5 +1,4 @@
 /**:
   ros__parameters:
-    param_name: 789
-    hot_start: true
+    hot_start: false
     safety_factor: 1
