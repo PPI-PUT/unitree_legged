@@ -20,11 +20,11 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-# def contact_remap(remap: LaunchConfiguration, context):
-#     remap_str = remap.perform(context)
-#     return [(f'~/output/{var}_contact', f'{remap_str}_{var}')
-#             for var in
-#             ['fr', 'fl', 'rr', 'rl']]
+def contact_remap(remap: LaunchConfiguration, context):
+    remap_str = remap.perform(context)
+    return [(f'~/output/{var}_contact', f'{remap_str}_{var}')
+            for var in
+            ['fr', 'fl', 'rr', 'rl']]
 
 
 def launch_setup(context, *args, **kwargs):
@@ -49,7 +49,7 @@ def launch_setup(context, *args, **kwargs):
             ("~/input/command", LaunchConfiguration("input_command_name")),
             ("~/output/joint_states", LaunchConfiguration("output_joint_state_name")),
             ("~/output/imu", LaunchConfiguration("output_imu_name")),
-        ],
+        ] + contact_remap(LaunchConfiguration("output_contact_name"), context),
         output='screen',
         arguments=['--ros-args', '--log-level',
                    'info', '--enable-stdout-logs'],
@@ -74,7 +74,7 @@ def generate_launch_description():
     add_launch_arg('output_joy_name', 'unitree_a1_legged/joy')
     add_launch_arg('output_joint_state_name', 'unitree_a1_legged/joint_states')
     add_launch_arg('output_imu_name', 'unitree_a1_legged/imu')
-    # add_launch_arg('output_contact_name', 'unitree_a1_legged/contact')
+    add_launch_arg('output_contact_name', 'unitree_a1_legged/contact')
 
     return LaunchDescription([
         *declared_arguments,

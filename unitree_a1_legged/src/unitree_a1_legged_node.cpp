@@ -24,15 +24,14 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
   hot_start = this->get_parameter("hot_start").as_bool();
   safety_factor_ = this->declare_parameter("safety_factor", 1);
   safety_factor_ = this->get_parameter("safety_factor").as_int();
-  RCLCPP_ERROR(this->get_logger(), "Starting Unitree Legged Node");
   if (hot_start) {
-    RCLCPP_INFO(this->get_logger(), "Starting Unitree Legged Node");
-    RCLCPP_INFO(
+    RCLCPP_WARN(this->get_logger(), "Starting Unitree Legged Node");
+    RCLCPP_WARN(
       this->get_logger(),
       "Make sure the robot is lied on the ground and the motors are turned on.");
-    RCLCPP_INFO(this->get_logger(), "Press L1 and hold A to sit down the robot.");
-    RCLCPP_INFO(this->get_logger(), "Press L1+L2 and A to turn on joint control mode.");
-    RCLCPP_INFO(this->get_logger(), "Press Enter to continue...");
+    RCLCPP_WARN(this->get_logger(), "Press L1 and hold A to sit down the robot.");
+    RCLCPP_WARN(this->get_logger(), "Press L1+L2 and A to turn on joint control mode.");
+    RCLCPP_WARN(this->get_logger(), "Press Enter to continue...");
     std::cin.get();
   }
   // Init motor Mode
@@ -52,14 +51,14 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
     "~/input/command", 1,
     std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
   timer_ = this->create_wall_timer(2ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
-  // foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-  //   "~/output/fr_contact", 1);
-  // foot_force_fl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-  //   "~/output/fl_contact", 1);
-  // foot_force_rr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-  //   "~/output/rr_contact", 1);
-  // foot_force_rl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-  //   "~/output/rl_contact", 1);
+  foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/fr_contact", 1);
+  foot_force_fl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/fl_contact", 1);
+  foot_force_rr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/rr_contact", 1);
+  foot_force_rl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+    "~/output/rl_contact", 1);
 }
 UnitreeLeggedNode::~UnitreeLeggedNode()
 {
