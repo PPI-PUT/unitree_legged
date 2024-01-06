@@ -60,6 +60,7 @@ def launch_setup(context, *args, **kwargs):
             "output_joy_name": "unitree_a1_legged/joy",
             "output_joint_state_name": "unitree_a1_legged/joint_states",
             "output_imu_name": "unitree_a1_legged/imu",
+            "output_contact_name": "unitree_a1_legged/contact",
         }.items()
     )
     unitree_legged_joystick_file = PathJoinSubstitution([
