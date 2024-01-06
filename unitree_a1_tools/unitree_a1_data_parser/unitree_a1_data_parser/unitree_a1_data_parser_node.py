@@ -44,7 +44,7 @@ class UnitreeA1DataParserNode(Node):
             self.state_callback,
             1)
         self.unitree_a1_data_parser = UnitreeA1DataParser()
-        self.path_name = self.declare_parameter('file_path', '').value
+        self.deadzone = self.declare_parameter('deadzone', 10.0).value
         rosbag_name = self.declare_parameter('rosbag_name', '').value
         rosbag_name = Path(rosbag_name)
         self.path_name = Path(rosbag_name.expanduser())
@@ -63,8 +63,8 @@ class UnitreeA1DataParserNode(Node):
         if not self.is_running:
             return 
         self.get_logger().info(f"Getting data for {self.path_name}")
-        if time_difference.nanoseconds > 10.0 * 1e9:
-            self.get_logger().error("No new element added in the last 10 seconds. Stopping the program.")
+        if time_difference.nanoseconds > self.deadzone * 1e9:
+            self.get_logger().error(f"No new element added in the last {self.deadzone} seconds. Stopping the program.")
             self.destroy_node()
             rclpy.shutdown()
 
