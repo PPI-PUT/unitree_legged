@@ -20,17 +20,20 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-def contact_remap(remap: LaunchConfiguration, context):
-    remap_str = remap.perform(context)
-    return [(f'~/output/{var}_contact', f'{remap_str}_{var}')
-            for var in
-            ['fr', 'fl', 'rr', 'rl']]
+# def contact_remap(remap: LaunchConfiguration, context):
+#     remap_str = remap.perform(context)
+#     return [(f'~/output/{var}_contact', f'{remap_str}_{var}')
+#             for var in
+#             ['fr', 'fl', 'rr', 'rl']]
+
 
 def launch_setup(context, *args, **kwargs):
-    param_path = LaunchConfiguration('unitree_a1_legged_param_file').perform(context)
+    param_path = LaunchConfiguration(
+        'unitree_a1_legged_param_file').perform(context)
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_legged'), 'config', 'unitree_a1_legged.param.yaml']
+            [FindPackageShare('unitree_a1_legged'), 'config',
+             'unitree_a1_legged.param.yaml']
         ).perform(context)
 
     unitree_a1_legged_node = Node(
@@ -48,7 +51,8 @@ def launch_setup(context, *args, **kwargs):
             ("~/output/imu", LaunchConfiguration("output_imu_name")),
         ],
         output='screen',
-        arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
+        arguments=['--ros-args', '--log-level',
+                   'info', '--enable-stdout-logs'],
     )
 
     return [
@@ -65,12 +69,12 @@ def generate_launch_description():
         )
 
     add_launch_arg('unitree_a1_legged_param_file', '')
-    add_launch_arg('output_state_name', 'unitree_a1_legged/cmd_vel')
-    add_launch_arg('input_command_name', 'unitree_a1_legged/joy')
-    add_launch_arg('output_joy_name', 'unitree_a1_legged/cmd_vel')
+    add_launch_arg('output_state_name', 'unitree_a1_legged/state')
+    add_launch_arg('input_command_name', 'unitree_a1_legged/cmd')
+    add_launch_arg('output_joy_name', 'unitree_a1_legged/joy')
     add_launch_arg('output_joint_state_name', 'unitree_a1_legged/joint_states')
     add_launch_arg('output_imu_name', 'unitree_a1_legged/imu')
-    add_launch_arg('output_contact_name', 'unitree_a1_legged/contact')
+    # add_launch_arg('output_contact_name', 'unitree_a1_legged/contact')
 
     return LaunchDescription([
         *declared_arguments,

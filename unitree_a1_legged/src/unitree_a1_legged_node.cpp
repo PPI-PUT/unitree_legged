@@ -52,14 +52,14 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
     "~/input/command", 1,
     std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
   timer_ = this->create_wall_timer(2ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
-  foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-    "~/output/fr_contact", 1);
-  foot_force_fl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-    "~/output/fl_contact", 1);
-  foot_force_rr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-    "~/output/rr_contact", 1);
-  foot_force_rl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
-    "~/output/rl_contact", 1);
+  // foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+  //   "~/output/fr_contact", 1);
+  // foot_force_fl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+  //   "~/output/fl_contact", 1);
+  // foot_force_rr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+  //   "~/output/rr_contact", 1);
+  // foot_force_rl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
+  //   "~/output/rl_contact", 1);
 }
 UnitreeLeggedNode::~UnitreeLeggedNode()
 {
