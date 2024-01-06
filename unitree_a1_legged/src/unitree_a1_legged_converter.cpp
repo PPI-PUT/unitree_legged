@@ -288,7 +288,7 @@ void Converter::getWrenchMsg(
   front_right.header.frame_id = "FR_foot";
   front_right.wrench.force.x = 0.0;
   front_right.wrench.force.y = 0.0;
-  front_right.wrench.force.z = state[FR_];
+  front_right.wrench.force.z = -static_cast<float>(state[FR_]);
   front_right.wrench.torque.x = 0.0;
   front_right.wrench.torque.y = 0.0;
   front_right.wrench.torque.z = 0.0;
@@ -296,7 +296,7 @@ void Converter::getWrenchMsg(
   front_left.header.frame_id = "FL_foot";
   front_left.wrench.force.x = 0.0;
   front_left.wrench.force.y = 0.0;
-  front_left.wrench.force.z = state[FL_];
+  front_left.wrench.force.z = -static_cast<float>(state[FL_]);
   front_left.wrench.torque.x = 0.0;
   front_left.wrench.torque.y = 0.0;
   front_left.wrench.torque.z = 0.0;
@@ -304,7 +304,7 @@ void Converter::getWrenchMsg(
   rear_right.header.frame_id = "RR_foot";
   rear_right.wrench.force.x = 0.0;
   rear_right.wrench.force.y = 0.0;
-  rear_right.wrench.force.z = state[RR_];
+  rear_right.wrench.force.z = -static_cast<float>(state[RR_]);
   rear_right.wrench.torque.x = 0.0;
   rear_right.wrench.torque.y = 0.0;
   rear_right.wrench.torque.z = 0.0;
@@ -312,7 +312,7 @@ void Converter::getWrenchMsg(
   rear_left.header.frame_id = "RL_foot";
   rear_left.wrench.force.x = 0.0;
   rear_left.wrench.force.y = 0.0;
-  rear_left.wrench.force.z = state[RL_];
+  rear_left.wrench.force.z = -static_cast<float>(state[RL_]);
   rear_left.wrench.torque.x = 0.0;
   rear_left.wrench.torque.y = 0.0;
   rear_left.wrench.torque.z = 0.0;
