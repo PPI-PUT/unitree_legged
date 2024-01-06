@@ -20,6 +20,11 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+def contact_remap(remap: LaunchConfiguration, context):
+    remap_str = remap.perform(context)
+    return [(f'~/output/{var}_contact', f'{remap_str}_{var}')
+            for var in
+            ['fr', 'fl', 'rr', 'rl']]
 
 def launch_setup(context, *args, **kwargs):
     param_path = LaunchConfiguration('unitree_a1_legged_param_file').perform(context)
@@ -65,6 +70,7 @@ def generate_launch_description():
     add_launch_arg('output_joy_name', 'unitree_a1_legged/cmd_vel')
     add_launch_arg('output_joint_state_name', 'unitree_a1_legged/joint_states')
     add_launch_arg('output_imu_name', 'unitree_a1_legged/imu')
+    add_launch_arg('output_contact_name', 'unitree_a1_legged/contact')
 
     return LaunchDescription([
         *declared_arguments,

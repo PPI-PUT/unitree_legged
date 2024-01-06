@@ -6,6 +6,7 @@
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/wrench_stamped.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 
@@ -84,5 +85,11 @@ public:
        */
   static unitree_a1_legged_msgs::msg::JointCommand getJointCommandMsg();
   static sensor_msgs::msg::Joy stateToMsg(const uint8_t (& state)[40]);
+  static void getWrenchMsg(
+    const int16_t state[4],
+    geometry_msgs::msg::WrenchStamped & front_right,
+    geometry_msgs::msg::WrenchStamped & front_left,
+    geometry_msgs::msg::WrenchStamped & rear_right,
+    geometry_msgs::msg::WrenchStamped & rear_left);
 };
 } // namespace unitree_a1_legged
