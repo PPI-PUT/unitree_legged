@@ -18,6 +18,8 @@ import rclpy
 import numpy as np
 import pandas as pd
 import math
+from datetime import datetime
+from pathlib import Path
 from rclpy.node import Node
 try:
     from unitree_a1_data_parser.unitree_a1_data_parser import UnitreeA1DataParser
@@ -43,14 +45,36 @@ class UnitreeA1DataParserNode(Node):
             1)
         self.unitree_a1_data_parser = UnitreeA1DataParser()
         self.path_name = self.declare_parameter('file_path', '').value
+        rosbag_name = self.declare_parameter('rosbag_name', '').value
+        rosbag_name = Path(rosbag_name)
+        self.path_name = Path(rosbag_name.expanduser())
+        self.path_name = self.path_name / \
+            f'{self.path_name.name.replace("rosbag2", "log")}.csv'
+        self.timer = self.create_timer(1.0, self.timer_callback)
         self.action_list = []
         self.state_list = []
         self.time = []
+        self.is_running = False
+        self.last_element_time = self.get_clock().now()
+
+    def timer_callback(self):
+        current_time = self.get_clock().now()
+        time_difference = current_time - self.last_element_time
+        if not self.is_running:
+            return 
+        self.get_logger().info(f"Getting data for {self.path_name}")
+        if time_difference.nanoseconds > 10.0 * 1e9:
+            self.get_logger().error("No new element added in the last 10 seconds. Stopping the program.")
+            self.destroy_node()
+            rclpy.shutdown()
 
     def action_callback(self, msg):
         time = self.get_time(msg.header.stamp)
         self.time.append(time)
+        if len(self.time) > 0:
+            self.is_running = True
         self.action_list.append(np.array(msg.data))
+        self.last_element_time = self.get_clock().now()
 
     def state_callback(self, msg):
         self.state_list.append(np.array(msg.data))
