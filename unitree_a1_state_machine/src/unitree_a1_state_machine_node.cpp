@@ -92,7 +92,7 @@ void UnitreeStateMachineNode::controlLoop()
   } else if (state == unitree_a1_state_machine::State::WALK) {
     if (check_safety_position(*walk_cmd_msg_)) {
       pub_cmd_->publish(*walk_cmd_msg_);
-    }else {
+    } else {
       RCLCPP_WARN(this->get_logger(), "Safety position error");
     }
   } else if (state == unitree_a1_state_machine::State::HOLD) {
@@ -133,8 +133,6 @@ void UnitreeStateMachineNode::resultCallback(const FixedStandGoal::WrappedResult
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      client_reset_controller_->async_send_request(
-        std::make_shared<Trigger::Request>());
       break;
     case rclcpp_action::ResultCode::ABORTED:
       RCLCPP_INFO(this->get_logger(), "Goal was aborted");
@@ -185,6 +183,8 @@ void UnitreeStateMachineNode::handleGait(
       } break;
     case 4:
       {
+        client_reset_controller_->async_send_request(
+          std::make_shared<Trigger::Request>());
         unitree_a1_state_machine_->nextState();
         RCLCPP_INFO(this->get_logger(), "Walk");
       } break;
