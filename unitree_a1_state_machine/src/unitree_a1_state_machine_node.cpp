@@ -24,7 +24,7 @@ constexpr double a1_Calf_min = -2.7;          // unit:radian ( = -154.5 degree)
 
 namespace unitree_a1_state_machine
 {
-bool check_safety_position(LowCmd & cmd)
+// bool check_safety_position(LowCmd & cmd)
 {
   if (a1_Thigh_max < cmd.motor_cmd.front_right.thigh.q ||
     a1_Thigh_min > cmd.motor_cmd.front_right.thigh.q ||
@@ -90,11 +90,7 @@ void UnitreeStateMachineNode::controlLoop()
   if (state == unitree_a1_state_machine::State::STAND) {
     pub_cmd_->publish(*stand_cmd_msg_);
   } else if (state == unitree_a1_state_machine::State::WALK) {
-    if (check_safety_position(*walk_cmd_msg_)) {
-      pub_cmd_->publish(*walk_cmd_msg_);
-    } else {
-      RCLCPP_WARN(this->get_logger(), "Safety position error");
-    }
+    pub_cmd_->publish(*walk_cmd_msg_);
   } else if (state == unitree_a1_state_machine::State::HOLD) {
     pub_cmd_->publish(*stand_cmd_msg_);
   }
