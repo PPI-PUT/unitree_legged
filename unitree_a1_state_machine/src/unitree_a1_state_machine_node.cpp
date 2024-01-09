@@ -24,38 +24,6 @@ constexpr double a1_Calf_min = -2.7;          // unit:radian ( = -154.5 degree)
 
 namespace unitree_a1_state_machine
 {
-// bool check_safety_position(LowCmd & cmd)
-{
-  if (a1_Thigh_max < cmd.motor_cmd.front_right.thigh.q ||
-    a1_Thigh_min > cmd.motor_cmd.front_right.thigh.q ||
-    a1_Thigh_max < cmd.motor_cmd.front_left.thigh.q ||
-    a1_Thigh_min > cmd.motor_cmd.front_left.thigh.q ||
-    a1_Thigh_max < cmd.motor_cmd.rear_right.thigh.q ||
-    a1_Thigh_min > cmd.motor_cmd.rear_right.thigh.q ||
-    a1_Thigh_max < cmd.motor_cmd.rear_left.thigh.q ||
-    a1_Thigh_min > cmd.motor_cmd.rear_left.thigh.q ||
-    a1_Calf_max < cmd.motor_cmd.front_right.calf.q ||
-    a1_Calf_min > cmd.motor_cmd.front_right.calf.q ||
-    a1_Calf_max < cmd.motor_cmd.front_left.calf.q ||
-    a1_Calf_min > cmd.motor_cmd.front_left.calf.q ||
-    a1_Calf_max < cmd.motor_cmd.rear_right.calf.q ||
-    a1_Calf_min > cmd.motor_cmd.rear_right.calf.q ||
-    a1_Calf_max < cmd.motor_cmd.rear_left.calf.q ||
-    a1_Calf_min > cmd.motor_cmd.rear_left.calf.q ||
-    a1_Hip_max < cmd.motor_cmd.front_right.hip.q ||
-    a1_Hip_min > cmd.motor_cmd.front_right.hip.q ||
-    a1_Hip_max < cmd.motor_cmd.front_left.hip.q ||
-    a1_Hip_min > cmd.motor_cmd.front_left.hip.q ||
-    a1_Hip_max < cmd.motor_cmd.rear_right.hip.q ||
-    a1_Hip_min > cmd.motor_cmd.rear_right.hip.q ||
-    a1_Hip_max < cmd.motor_cmd.rear_left.hip.q ||
-    a1_Hip_min > cmd.motor_cmd.rear_left.hip.q)
-  {
-    return false;
-  }
-  return true;
-}
-
 UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & options)
 :  Node("unitree_a1_state_machine", options)
 {
