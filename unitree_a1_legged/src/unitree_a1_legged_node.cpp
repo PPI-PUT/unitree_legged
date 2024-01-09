@@ -50,7 +50,7 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
   low_command_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::LowCmd>(
     "~/input/command", 1,
     std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
-  timer_ = this->create_wall_timer(2ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
+  timer_ = this->create_wall_timer(1ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
   foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
     "~/output/fr_contact", 1);
   foot_force_fl_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(
