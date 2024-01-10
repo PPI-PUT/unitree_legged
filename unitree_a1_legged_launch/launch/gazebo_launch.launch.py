@@ -60,9 +60,10 @@ def generate_launch_description():
         executable="robot_state_publisher",
         output="both",
         parameters=[robot_description],
+        remappings=[("joint_states", "/unitree_a1_neural_control_node/output/nn/joint_states")],
     )
     spawn_entity = Node(
-        package="gunazebo_ros",
+        package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=["-topic", "robot_description",
                    "-entity", "a1_gazebo", "-z", "0.6"],
