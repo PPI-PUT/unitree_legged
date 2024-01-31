@@ -1,3 +1,4 @@
 std_msgs/Header header
+std_msgs/Header header_elapsed
 CommonMotorCmd common
 QuadrupedCmd motor_cmd
