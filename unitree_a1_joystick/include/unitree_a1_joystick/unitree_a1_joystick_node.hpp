@@ -17,6 +17,7 @@
 #define UNITREE_A1_JOYSTICK__UNITREE_A1_JOYSTICK_NODE_HPP_
 
 #include "unitree_a1_joystick/unitree_a1_joystick.hpp"
+#include "unitree_a1_joystick/unitree_a1_button.hpp"
 #include "unitree_a1_legged_msgs/srv/gait.hpp"
 #include "unitree_a1_legged_msgs/msg/controller_type.hpp"
 #include <geometry_msgs/msg/twist_stamped.hpp>
@@ -35,6 +36,7 @@ double calcMappingdouble(const double input, const double sensitivity)
 
 namespace unitree_a1_legged
 {
+using ButtonPtr = std::unique_ptr<unitree_a1_legged::Button>;
 class UNITREE_A1_JOYSTICK_PUBLIC UnitreeJoystickNode : public rclcpp::Node
 {
 public:
@@ -63,11 +65,20 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joystick_subscriber_;
   rclcpp::Time last_joy_received_time_;
   std::shared_ptr<UnitreeJoystick> joy_;
+  ButtonPtr direction_x_button_{nullptr};
+  ButtonPtr direction_y_button_{nullptr};
+  ButtonPtr direction_z_button_{nullptr};
+  ButtonPtr button_a_stand_{nullptr};
+  ButtonPtr button_b_walking_{nullptr};
+  ButtonPtr button_x_stop_{nullptr};
+
   rclcpp::Client<unitree_a1_legged_msgs::srv::Gait>::SharedPtr client_gait_;
   void receiveJoystickCallback(const sensor_msgs::msg::Joy::SharedPtr msg);
   void publishTwist();
   void indexButtonCallback();
-  int directionalButtons();
+  void indexButtonRequest(uint8_t type);
+  void directionalButtonsCallback();
+  void directionButton(bool increase, bool decrease, ButtonPtr & button);
   void timerCallback();
   bool isDataReady();
   std::tuple<int32_t, uint32_t> getDurationTime(double duration);
