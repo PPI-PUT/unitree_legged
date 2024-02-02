@@ -11,10 +11,12 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 set(UNITREE_A1_JOYSTICK_LIB_SRC
   src/unitree_a1_joystick.cpp
+  src/unitree_a1_button.cpp
 )
 
 set(UNITREE_A1_JOYSTICK_LIB_HEADERS
   include/unitree_a1_joystick/unitree_a1_joystick.hpp
+  include/unitree_a1_joystick/unitree_a1_button.hpp
   include/unitree_a1_joystick/visibility_control.hpp
 )
 
