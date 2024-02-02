@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,25 +34,17 @@ sensor_msgs::msg::Imu Converter::stateToMsg(const IMU & state)
   msg.linear_acceleration.z = state.accelerometer[2];
   return msg;
 }
-std::unique_ptr<unitree_a1_legged_msgs::msg::LowState> Converter::stateToMsg(const LowState & state)
+unitree_a1_legged_msgs::msg::LowState Converter::stateToMsg(const LowState & state)
 {
-  auto msg = std::make_unique<unitree_a1_legged_msgs::msg::LowState>();
-  // msg->a1.level_flag = state.levelFlag;
-  // msg->a1.comm_version = state.commVersion;
-  // msg->a1.robot_id = state.robotID;
-  // msg->a1.sn = state.SN;
-  // msg->a1.band_width = state.bandWidth;
-  msg->imu = Converter::stateToMsg(state.imu);
-  msg->motor_state = Converter::stateToMsg(state.motorState);
-  msg->foot_force = Converter::stateToMsg(state.footForce);
-  // msg.foot_force_est = Converter::stateToMsg(state.footForceEst);
-  msg->tick = state.tick;
+  unitree_a1_legged_msgs::msg::LowState msg;
+  msg.imu = Converter::stateToMsg(state.imu);
+  msg.motor_state = Converter::stateToMsg(state.motorState);
+  msg.foot_force = Converter::stateToMsg(state.footForce);
+  msg.tick = state.tick;
   // for (int i = 0; i < 40; i++)
   // {
   //     msg.wireless_remote[i] = state.wirelessRemote[i];
   // }
-  // msg->reserve = state.reserve;
-  // msg->crc = state.crc;
   return msg;
 }
 unitree_a1_legged_msgs::msg::QuadrupedState Converter::stateToMsg(const MotorState (& state)[20])
@@ -78,14 +70,8 @@ unitree_a1_legged_msgs::msg::MotorState Converter::stateToMsg(const MotorState &
   msg.mode = state.mode;
   msg.q = state.q;
   msg.dq = state.dq;
-  // msg.ddq = state.ddq;
   msg.tau_est = state.tauEst;
-  // msg.q_raw = state.q_raw;
-  // msg.dq_raw = state.dq_raw;
-  // msg.ddq_raw = state.ddq_raw;
   msg.temperature = state.temperature;
-  // msg.reserve[0] = state.reserve[0];
-  // msg.reserve[1] = state.reserve[1];
   return msg;
 }
 unitree_a1_legged_msgs::msg::FootForceState Converter::stateToMsg(const int16_t state[4])
@@ -97,7 +83,7 @@ unitree_a1_legged_msgs::msg::FootForceState Converter::stateToMsg(const int16_t 
   msg.rear_left = state[RL_];
   return msg;
 }
-void Converter::msgToCmd(unitree_a1_legged_msgs::msg::LowCmd::UniquePtr msg, LowCmd & cmd)
+void Converter::msgToCmd(const unitree_a1_legged_msgs::msg::LowCmd::SharedPtr msg, LowCmd & cmd)
 {
   // cmd.levelFlag = msg->a1.level_flag;
   // cmd.commVersion = msg->a1.comm_version;
@@ -138,7 +124,7 @@ void Converter::msgToCmd(unitree_a1_legged_msgs::msg::LowCmd::UniquePtr msg, Low
   // cmd.crc = msg->crc;
 }
 void Converter::msgToCmd(
-  unitree_a1_legged_msgs::msg::JointCommand::UniquePtr msg,
+  const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg,
   LowCmd & cmd)
 {
   // check size of msg

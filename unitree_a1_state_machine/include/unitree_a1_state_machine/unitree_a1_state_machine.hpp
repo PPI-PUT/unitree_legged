@@ -38,6 +38,7 @@ public:
   UnitreeStateMachine();
   void nextState();
   State getState() const;
+  void setState(State state);
 
 private:
   State state_;

@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -67,31 +67,41 @@ UnitreeLeggedNode::~UnitreeLeggedNode()
   }
 }
 
+void UnitreeLeggedNode::updateLoop()
+{
+  while (rclcpp::ok()) {
+    unitree_a1_legged_msgs::msg::LowState low_state_ros;
+    unitree_.recvLowState();
+    low_state_ros = Converter::stateToMsg(unitree_.getLowState());
+    state_publisher_->publish(low_state_ros);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+  }
+}
 void UnitreeLeggedNode::receiveCommandCallback(
-  unitree_a1_legged_msgs::msg::LowCmd::UniquePtr msg)
+  const unitree_a1_legged_msgs::msg::LowCmd::SharedPtr msg)
 {
   // Convert to lowlevel cmd
   auto low_cmd_once = unitree_.getLowCmd();
-  Converter::msgToCmd(std::move(msg), low_cmd_once);
+  Converter::msgToCmd(msg, low_cmd_once);
   unitree_.sendProtectLowCmd(low_cmd_once, safety_factor_);
 }
 void UnitreeLeggedNode::receiveJointCommandCallback(
-  unitree_a1_legged_msgs::msg::JointCommand::UniquePtr msg)
+  const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg)
 {
   // Convert to lowlevel cmd
   auto low_cmd_once = unitree_.getLowCmd();
-  Converter::msgToCmd(std::move(msg), low_cmd_once);
+  Converter::msgToCmd(msg, low_cmd_once);
   unitree_.sendProtectLowCmd(low_cmd_once, safety_factor_);
 }
 void UnitreeLeggedNode::updateStateCallback()
 {
   // Get state
   unitree_.recvLowState();
+  auto stamp = this->now();
   // Convert to lowlevel state msgs
   auto low_state_ros = Converter::stateToMsg(unitree_.getLowState());
-  auto stamp = this->now();
-  low_state_ros->header.stamp = stamp;
-  state_publisher_->publish(std::move(low_state_ros));
+  low_state_ros.header.stamp = stamp;
+  state_publisher_->publish(low_state_ros);
   // Convert to joint state msgs
   auto joint_state_msg = Converter::getJointStateMsg(unitree_.getLowState());
   joint_state_msg.header.stamp = stamp;

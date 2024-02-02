@@ -38,15 +38,16 @@ public:
   explicit UnitreeStateMachineNode(const rclcpp::NodeOptions & options);
 
 private:
+  std::mutex publisherMutex;
   UnitreeStateMachinePtr unitree_a1_state_machine_{nullptr};
   rclcpp::Service<Gait>::SharedPtr server_gait_;
   rclcpp_action::Client<FixedStand>::SharedPtr fixed_stand_client_;
   rclcpp::Subscription<LowCmd>::SharedPtr stand_cmd_;
   LowCmd::SharedPtr stand_cmd_msg_;
-  void standCallback(const LowCmd::SharedPtr msg);
+  void standCallback(LowCmd::UniquePtr msg);
   rclcpp::Subscription<LowCmd>::SharedPtr walk_cmd_;
   LowCmd::SharedPtr walk_cmd_msg_;
-  void walkCallback(const LowCmd::SharedPtr msg);
+  void walkCallback(LowCmd::UniquePtr msg);
   rclcpp::Publisher<LowCmd>::SharedPtr pub_cmd_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;

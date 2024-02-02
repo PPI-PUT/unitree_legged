@@ -32,5 +32,9 @@ State UnitreeStateMachine::getState() const
 {
   return state_;
 }
+void UnitreeStateMachine::setState(State state)
+{
+  state_ = state;
+}
 
 }  // namespace unitree_a1_state_machine

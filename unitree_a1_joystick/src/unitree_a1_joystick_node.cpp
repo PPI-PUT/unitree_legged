@@ -34,13 +34,6 @@ UnitreeJoystickNode::UnitreeJoystickNode(const rclcpp::NodeOptions & options)
   double button_deadzone = this->declare_parameter<double>("button_deadzone", 1.0);
   double dir_button_deadzone = this->declare_parameter<double>("dir_button_deadzone", 0.3);
   velocity_increment_ = this->declare_parameter<double>("velocity_increment", 0.05);
-  // set deadzone
-  int32_t sec;
-  uint32_t nanosec;
-  std::tie(sec, nanosec) = getDurationTime(button_deadzone);
-  button_hold_deadzone_ = rclcpp::Duration(sec, nanosec);
-  std::tie(sec, nanosec) = getDurationTime(dir_button_deadzone);
-  dir_button_hold_deadzone_ = rclcpp::Duration(sec, nanosec);
   // Create timer
   const auto period_ns =
     std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -49,7 +42,27 @@ UnitreeJoystickNode::UnitreeJoystickNode(const rclcpp::NodeOptions & options)
       update_rate_));
   timer_ = rclcpp::create_timer(
     this, get_clock(), period_ns, std::bind(&UnitreeJoystickNode::timerCallback, this));
-
+  // Deadzone time
+  int32_t sec;
+  uint32_t nanosec;
+  // Create buttons
+  std::tie(sec, nanosec) = getDurationTime(dir_button_deadzone);
+  direction_x_button_ = std::make_unique<Button>(
+    sec, nanosec, velocity_increment_, 0.01, -linear_velocity_limit_,
+    linear_velocity_limit_);
+  direction_y_button_ = std::make_unique<Button>(
+    sec, nanosec, velocity_increment_, 0.01, -linear_velocity_limit_,
+    linear_velocity_limit_);
+  direction_z_button_ = std::make_unique<Button>(
+    sec, nanosec, velocity_increment_, 0.01, -linear_velocity_limit_,
+    linear_velocity_limit_);
+  std::tie(sec, nanosec) = getDurationTime(button_deadzone);
+  button_a_stand_ = std::make_unique<Button>(
+    sec, nanosec);
+  button_b_walking_ = std::make_unique<Button>(
+    sec, nanosec);
+  button_x_stop_ = std::make_unique<Button>(
+    0, nanosec);
   // Create publishers
   twist_publisher_ =
     this->create_publisher<geometry_msgs::msg::TwistStamped>("~/output/cmd_vel", 1);
@@ -79,81 +92,78 @@ void UnitreeJoystickNode::publishTwist()
         linear_ratio_ *
         calcMappingdouble(static_cast<double>(joy_->linear_x()), linear_x_sensitivity_);
     }
+    if (joy_->linear_y()) {
+      twist_msg.twist.linear.y =
+        linear_ratio_ *
+        calcMappingdouble(static_cast<double>(joy_->linear_y()), linear_y_sensitivity_);
+    }
+    if (joy_->angular_z()) {
+      twist_msg.twist.angular.z =
+        angular_ratio_ * calcMappingdouble(
+        static_cast<double>(joy_->angular_z()), angular_z_sensitivity_);
+    }
   } else if (joy_or_dir_button_ == 1) {
-    linear_x_velocity_ += this->directionalButtons() * velocity_increment_;
-    if (linear_x_velocity_ > linear_velocity_limit_) {
-      linear_x_velocity_ = linear_velocity_limit_;
-    }
-    if (linear_x_velocity_ < -linear_velocity_limit_) {
-      linear_x_velocity_ = -linear_velocity_limit_;
-    }
-    twist_msg.twist.linear.x = linear_x_velocity_;
+    this->directionalButtonsCallback();
+    twist_msg.twist.linear.x = direction_x_button_->getValue();
+    twist_msg.twist.linear.y = direction_y_button_->getValue();
+    twist_msg.twist.angular.z = direction_z_button_->getValue();
+  } else if (joy_or_dir_button_ == -1) {
+    return;
   }
-
-  if (joy_->linear_y()) {
-    twist_msg.twist.linear.y =
-      linear_ratio_ *
-      calcMappingdouble(static_cast<double>(joy_->linear_y()), linear_y_sensitivity_);
-  }
-  if (joy_->angular_z()) {
-    twist_msg.twist.angular.z =
-      angular_ratio_ * calcMappingdouble(
-      static_cast<double>(joy_->angular_z()), angular_z_sensitivity_);
-  }
-  twist_msg.twist.linear.y = 0.0;
-  twist_msg.twist.angular.z = 0.0;
   twist_publisher_->publish(twist_msg);
 }
 
 void UnitreeJoystickNode::indexButtonCallback()
 {
   rclcpp::Time now = this->get_clock()->now();
-
-  if (joy_->stand() || joy_->neural()) {
-    button_hold_duration_ = button_hold_duration_ + (now - last_time_button_pressed_);
-  } else {
-    button_hold_duration_ = rclcpp::Duration(0, 0);
+  if (button_x_stop_->getAction(joy_->stop(), now, 0.0)) {
+    RCLCPP_INFO(get_logger(), "STOP");
+    this->indexButtonRequest(unitree_a1_legged_msgs::msg::ControllerType::STOP);
+    return;
   }
-  if (button_hold_duration_ > button_hold_deadzone_) {
+  if (button_a_stand_->getAction(joy_->stand(), now, 0.0)) {
     RCLCPP_INFO(get_logger(), "Stand");
-    auto request = std::make_shared<unitree_a1_legged_msgs::srv::Gait::Request>();
-    auto msg = unitree_a1_legged_msgs::msg::ControllerType();
-    if (joy_->stand()) {
-      msg.type = 3;
-    } else if (joy_->neural()) {
-      msg.type = 4;
-    }
-    request->method = msg; //unitree_a1_legged_msgs::msg::ControllerType::FIXED_STAND;
-    client_gait_->async_send_request(request);
-    button_hold_duration_ = rclcpp::Duration(0, 0);
+    this->indexButtonRequest(unitree_a1_legged_msgs::msg::ControllerType::FIXED_STAND);
+    return;
   }
-  last_time_button_pressed_ = now;
+  if (button_b_walking_->getAction(joy_->neural(), now, 0.0)) {
+    RCLCPP_INFO(get_logger(), "Neural Controller Walking");
+    this->indexButtonRequest(unitree_a1_legged_msgs::msg::ControllerType::NEURAL);
+    return;
+  }
 }
 
-int UnitreeJoystickNode::directionalButtons()
+void UnitreeJoystickNode::indexButtonRequest(uint8_t type)
+{
+  auto request = std::make_shared<unitree_a1_legged_msgs::srv::Gait::Request>();
+  auto msg = unitree_a1_legged_msgs::msg::ControllerType();
+  msg.type = type;
+  request->method = msg;
+  client_gait_->async_send_request(request);
+}
+
+void UnitreeJoystickNode::directionalButtonsCallback()
+{
+  this->directionButton(joy_->increase_linear_x(), joy_->decrease_linear_x(), direction_x_button_);
+  this->directionButton(joy_->increase_linear_y(), joy_->decrease_linear_y(), direction_y_button_);
+  this->directionButton(
+    joy_->increase_angular_z(), joy_->decrease_angular_z(),
+    direction_z_button_);
+}
+void UnitreeJoystickNode::directionButton(bool increase, bool decrease, ButtonPtr & button)
 {
   rclcpp::Time now = this->get_clock()->now();
-
-  if (joy_->increase_speed() || joy_->decrease_speed()) {
-    dir_button_hold_duration_ = dir_button_hold_duration_ + (now - last_time_dir_button_pressed_);
+  if (increase ^ decrease) {
+    if (increase) {
+      button->getAction(true, now, 1.0);
+    } else if (decrease) {
+      button->getAction(true, now, -1.0);
+    }
   } else {
-    dir_button_hold_duration_ = rclcpp::Duration(0, 0);
+    button->getAction(false, now, 0.0);
   }
-  last_time_dir_button_pressed_ = now;
-  if (joy_->increase_speed() && joy_->decrease_speed()) {
-    return 0;
-  }
-  if (dir_button_hold_duration_ > dir_button_hold_deadzone_) {
-    dir_button_hold_duration_ = rclcpp::Duration(0, 0);
-    if (joy_->increase_speed()) {
-      return 1;
-    }
-    if (joy_->decrease_speed()) {
-      return -1;
-    }
-  }
-  return 0;
 }
+
 void UnitreeJoystickNode::timerCallback()
 {
   if (!isDataReady()) {
