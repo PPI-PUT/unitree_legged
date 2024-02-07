@@ -154,7 +154,7 @@ def launch_setup(context, *args, **kwargs):
         name='unitree_a1_container',
         namespace='',
         package='rclcpp_components',
-        executable='component_container_mt',
+        executable='component_container',
         composable_node_descriptions=[
             unitree_legged_launch,
             unitree_joystick_launch,
