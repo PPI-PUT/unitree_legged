@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "unitree_a1_legged/unitree_a1_legged_node.hpp"
-
+#include <rclcpp/qos.hpp>
 namespace unitree_a1_legged
 {
 
@@ -37,9 +37,12 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
   // Init motor Mode
   unitree_.setMotorMode(PMSM_SERVO_MODE);
   // state_thread_ = std::thread(std::bind(&UnitreeLeggedNode::updateLoop, this));
+  auto qos = rclcpp::QoS(1);
+  qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+  qos.durability_volatile();
   state_publisher_ = this->create_publisher<unitree_a1_legged_msgs::msg::LowState>(
     "~/output/state",
-    1);
+    qos);
   joint_state_publisher_ =
     this->create_publisher<sensor_msgs::msg::JointState>("~/output/joint_states", 1);
   joystick_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>("~/output/joy", 1);
@@ -48,7 +51,7 @@ UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
     "~/input/joint_command", 1,
     std::bind(&UnitreeLeggedNode::receiveJointCommandCallback, this, std::placeholders::_1));
   low_command_subscriber_ = this->create_subscription<unitree_a1_legged_msgs::msg::LowCmd>(
-    "~/input/command", 1,
+    "~/input/command", qos,
     std::bind(&UnitreeLeggedNode::receiveCommandCallback, this, std::placeholders::_1));
   timer_ = this->create_wall_timer(1ms, std::bind(&UnitreeLeggedNode::updateStateCallback, this));
   foot_force_fr_publisher_ = this->create_publisher<geometry_msgs::msg::WrenchStamped>(

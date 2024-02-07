@@ -24,8 +24,11 @@ UnitreeFixedStandServerNode::UnitreeFixedStandServerNode(const rclcpp::NodeOptio
 {
   state_ = std::make_shared<LowState>();
   request_fixed_stand_rate_ = this->declare_parameter("request_fixed_stand_rate", 50);
+  auto qos = rclcpp::QoS(1);
+  qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+  qos.durability_volatile();
   sub_state_ = this->create_subscription<LowState>(
-    "~/input/state", 1,
+    "~/input/state", qos,
     std::bind(&UnitreeFixedStandServerNode::stateCallback, this, _1));
   pub_cmd_ = this->create_publisher<LowCmd>("~/output/cmd", 1);
 
