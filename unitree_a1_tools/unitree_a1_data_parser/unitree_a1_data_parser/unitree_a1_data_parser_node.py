@@ -65,6 +65,7 @@ class UnitreeA1DataParserNode(Node):
         self.get_logger().info(f"Getting data for {self.path_name}")
         if time_difference.nanoseconds > self.deadzone * 1e9:
             self.get_logger().error(f"No new element added in the last {self.deadzone} seconds. Stopping the program.")
+            self.store()
             self.destroy_node()
             rclpy.shutdown()
 
@@ -83,7 +84,7 @@ class UnitreeA1DataParserNode(Node):
         # Calculate the time
         return math.fsum([stamp.sec, stamp.nanosec * math.pow(10, -9)])
 
-    def __del__(self):
+    def store(self):
         # On destruction, save the data to a csv file
         df = pd.DataFrame()
         df['time'] = self.time
