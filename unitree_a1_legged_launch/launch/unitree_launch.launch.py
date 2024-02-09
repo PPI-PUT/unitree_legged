@@ -51,7 +51,7 @@ def launch_setup(context, *args, **kwargs):
                 ("/unitree_a1_legged/input/command", "unitree_a1_legged/cmd"),
                 ("/unitree_a1_legged/output/joint_states",
                  "unitree_a1_legged/joint_states"),
-                ("/unitree_a1_legged/output/imu", "unitree_a1_legged/sensors/imu"),
+                ("/unitree_a1_legged/output/imu", "unitree_a1_legged/sensors/imu/data_raw"),
                 ("/unitree_a1_legged/output/fl_contact",
                  "unitree_a1_legged/sensors/contact_fl"),
                 ("/unitree_a1_legged/output/fr_contact",
@@ -147,20 +147,39 @@ def launch_setup(context, *args, **kwargs):
              "/unitree_a1_legged/controller/nn/cmd"),
             ("/unitree_a1_neural_control/service/reset",
              "/unitree_a1_legged/nn/reset_controller"),
+            ("/unitree_a1_neural_control/input/imu",
+             ("/unitree_a1_legged/sensors/imu/data_raw")),
         ],
+        extra_arguments=[{'use_intra_process_comms': True}]
+    )
+    imu_filter_params = PathJoinSubstitution([
+        pkg_prefix,
+        "config",
+        "imu_filter.yaml"
+    ])
+    imu_madgwick_component = ComposableNode(
+        package='imu_filter_madgwick',
+        plugin='ImuFilterMadgwickRos',
+        name='imu_filter',
+        remappings=[
+            ("/imu/data_raw", "/unitree_a1_legged/sensors/imu/data_raw"),
+            ("/imu/data", "/unitree_a1_legged/sensors/imu/data"),
+        ],
+        parameters=[imu_filter_params],
         extra_arguments=[{'use_intra_process_comms': True}]
     )
     container = ComposableNodeContainer(
         name='unitree_a1_container',
         namespace='',
         package='rclcpp_components',
-        executable='component_container',
+        executable='component_container_mt',
         composable_node_descriptions=[
             unitree_legged_launch,
             unitree_joystick_launch,
             state_machine_component,
-            stand_server_component,
-            neural_component
+            # stand_server_component,
+            neural_component,
+            # imu_madgwick_component,
         ],
         output='both',
     )
