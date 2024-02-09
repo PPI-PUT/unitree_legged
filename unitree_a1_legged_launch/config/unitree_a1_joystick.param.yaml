@@ -1,6 +1,10 @@
 /**:
   ros__parameters:
     update_rate: 50
+    button_deadzone: 1.0 # seconds
+    dir_button_deadzone: 0.33 # seconds
+    joy_or_dir_button: 0 # linear x: 0: joy, 1: dir_button, 3: trajectory
+    velocity_increment: 0.05 # m/s if linear x: dir_button
     linear_ratio: 0.5
     angular_ratio: 0.5
     linear_x_sensitivity: 0.5
