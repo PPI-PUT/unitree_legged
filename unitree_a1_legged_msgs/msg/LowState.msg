@@ -1,5 +1,4 @@
 std_msgs/Header header
-std_msgs/Header header_elapsed
 # UnitreeHeader a1 # not used             
 sensor_msgs/Imu imu
 QuadrupedState motor_state
