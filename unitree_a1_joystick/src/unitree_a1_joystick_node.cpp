@@ -22,8 +22,11 @@ UnitreeJoystickNode::UnitreeJoystickNode(const rclcpp::NodeOptions & options)
 {
   // Parameters
   linear_x_velocity_ = 0.0;
-  joy_or_dir_button_ = this->declare_parameter<int>("joy_or_dir_button", 1);
   update_rate_ = this->declare_parameter<int>("update_rate", 50);
+  double dir_button_deadzone = this->declare_parameter<double>("dir_button_deadzone", 0.3);
+  double button_deadzone = this->declare_parameter<double>("button_deadzone", 1.0);
+  joy_or_dir_button_ = this->declare_parameter<int>("joy_or_dir_button", 1);
+  velocity_increment_ = this->declare_parameter<double>("velocity_increment", 0.05);
   linear_ratio_ = this->declare_parameter<double>("linear_ratio", 0.5);
   angular_ratio_ = this->declare_parameter<double>("angular_ratio", 0.5);
   linear_x_sensitivity_ = this->declare_parameter<double>("linear_x_sensitivity", 0.5);
@@ -31,9 +34,6 @@ UnitreeJoystickNode::UnitreeJoystickNode(const rclcpp::NodeOptions & options)
   linear_velocity_limit_ = this->declare_parameter<double>("linear_velocity_limit", 0.5);
   angular_z_sensitivity_ = this->declare_parameter<double>("angular_z_sensitivity", 0.5);
   angular_velocity_limit_ = this->declare_parameter<double>("angular_velocity_limit", 0.5);
-  double button_deadzone = this->declare_parameter<double>("button_deadzone", 1.0);
-  double dir_button_deadzone = this->declare_parameter<double>("dir_button_deadzone", 0.3);
-  velocity_increment_ = this->declare_parameter<double>("velocity_increment", 0.05);
   // Create timer
   const auto period_ns =
     std::chrono::duration_cast<std::chrono::nanoseconds>(
