@@ -32,26 +32,34 @@ ros2 launch unitree_a1_joystick unitree_a1_joystick.launch.py
 
 | Name         | Type                  | Description  |
 | ------------ | --------------------- | ------------ |
-| `topic_name` | std_msgs::msg::String | Sample desc. |
+| `~/input/joy` | sensor_msgs::msg::Joy | Raw input from joystick |
 
 ### Output
 
 | Name         | Type                  | Description  |
 | ------------ | --------------------- | ------------ |
-| `topic_name` | std_msgs::msg::String | Sample desc. |
+| `~/output/cmd_vel` | geometry_msgs::msg::TwistStamped | Velocity messege |
 
 ### Services and Actions
 
 | Name           | Type                   | Description  |
 | -------------- | ---------------------- | ------------ |
-| `service_name` | std_srvs::srv::Trigger | Sample desc. |
+| `~/service/gait` | unitree_a1_legged_msgs::srv::Gait  | Client for triggering action like walk, stop, stand... |
 
 ### Parameters
 
 | Name         | Type | Description  |
 | ------------ | ---- | ------------ |
-| `param_name` | int  | Sample desc. |
+| `update_rate` | int  | Update joy rate |
+| `dir_button_deadzone` | double | time to hold button dir button |
+| `button_deadzoe`| double | time to hold action button like X, Y, Z |
+| `joy_or_dir_button`| int | To control speed you can choose: 0 - linear joy,  1 - dir buttons, -1 : By toppic |
+| `velocity_increment`| double | Increment of dir buttons |
+| `linear_ratio`| double | linear ratio for x, y joy |
+| `angular_ratio` | double | linear ratio for z joy |
+| `linear_x_sensitivity` |  double  | sensitivity for linear joy x |
+| `linear_y_sensitivity` |  double  | sensitivity for linear joy y |
+| `linear_velocity_limit` | double | linear velocity limit |
+| `angular_velocity_limit`| double | angular velocity limit |
 
 
-## References / External links
-<!-- Optional -->

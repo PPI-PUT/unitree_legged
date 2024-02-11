@@ -13,16 +13,25 @@ The UnitreeLegged class within this package manages the communication with Unitr
 
 | Name                            | Type                               | Description       |
 | ------------------------------- | ---------------------------------- | ----------------- |
-| `unitree_lowlevel\state`        | unitree_legged_msgs::msg::LowState | States of unitree |
-| `unitree_lowlevel\joint_states` | sensor_msgs::msg::JointState       | State of joints   |
+| `~/output/state`        | unitree_legged_msgs::msg::LowState | States of unitree |
+| `~/output/joint_states` | sensor_msgs::msg::JointState       | State of joints   |
+| `~/output/joy` | sensor_msgs::msg::Joy       | State of joy   |
+| `~/output/imu` | sensor_msgs::msg::Imu | Imu |
+
 
 
 ### Input
 
 | Name      | Type                                | Description |
 | --------- | ----------------------------------- | ----------- |
-| `command` | unitree_a1_legged_msgs::msg::LowCmd | Commands    |
+| `~/input/command` | unitree_a1_legged_msgs::msg::LowCmd | Commands    |
 
+### Parameters
+
+| Name         | Type | Description  |
+| ------------ | ---- | ------------ |
+| `hot_start` | bool | Hot start without confirmation |
+|`safety_factor`| int | Power limit 1: 10%, 10 : 100%|
 
 ### Converter
 The Converter class provides methods for converting Unitree commands and states to ROS 2 messages and vice versa. It serves as an essential bridge between the Unitree SDK and ROS 2, facilitating seamless communication with Unitree robots.

@@ -23,35 +23,18 @@ colcon build --symlink-install --packages-up-to unitree_a1_legged_launch
 ros2 launch unitree_a1_legged_launch unitree_a1_legged_launch.launch.py
 ```
 
-## API
+## Description
 <!-- Required -->
 <!-- Things to consider:
     - How do you use the package / API? -->
 
-### Input
+### Config 
+Config directory contains configs file. To change the parameters, make them here.
 
-| Name         | Type                  | Description  |
-| ------------ | --------------------- | ------------ |
-| `topic_name` | std_msgs::msg::String | Sample desc. |
+### Launch
 
-### Output
+- unitree_launch.launch.py : run whole stack
+- rviz_launch.launch.py : run visualization of states in rviz
+- rviz_nn_launch.launch.py : vizualization of control commands from nn controller
+- gazebo_launch.launch.py : run simulator in gazebo
 
-| Name         | Type                  | Description  |
-| ------------ | --------------------- | ------------ |
-| `topic_name` | std_msgs::msg::String | Sample desc. |
-
-### Services and Actions
-
-| Name           | Type                   | Description  |
-| -------------- | ---------------------- | ------------ |
-| `service_name` | std_srvs::srv::Trigger | Sample desc. |
-
-### Parameters
-
-| Name         | Type | Description  |
-| ------------ | ---- | ------------ |
-| `param_name` | int  | Sample desc. |
-
-
-## References / External links
-<!-- Optional -->
