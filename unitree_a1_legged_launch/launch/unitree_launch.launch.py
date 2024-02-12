@@ -177,9 +177,9 @@ def launch_setup(context, *args, **kwargs):
             unitree_legged_launch,
             unitree_joystick_launch,
             state_machine_component,
-            # stand_server_component,
+            stand_server_component,
             neural_component,
-            # imu_madgwick_component,
+            imu_madgwick_component,
         ],
         output='both',
     )
