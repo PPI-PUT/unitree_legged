@@ -20,19 +20,25 @@ UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & opt
 :  Node("unitree_a1_state_machine", options)
 {
   RCLCPP_INFO(this->get_logger(), "use_intra_process_comms: %d", options.use_intra_process_comms());
-
-  joint_state_publisher_ =
-    this->create_publisher<sensor_msgs::msg::JointState>("~/output/nn/joint_states", 1);
+  unitree_a1_state_machine_ = std::make_unique<unitree_a1_state_machine::UnitreeStateMachine>();
   stand_cmd_msg_ = std::make_shared<LowCmd>();
   walk_cmd_msg_ = std::make_shared<LowCmd>();
-  unitree_a1_state_machine_ = std::make_unique<unitree_a1_state_machine::UnitreeStateMachine>();
+  auto sub_options = rclcpp::SubscriptionOptions();
+  sub_options.topic_stats_options.state = rclcpp::TopicStatisticsState::Enable;
+  sub_options.topic_stats_options.publish_period = std::chrono::seconds(1);
+  sub_options.topic_stats_options.publish_topic = "~/statistics";
+  auto qos = rclcpp::QoS(1);
+  qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
+  qos.durability_volatile();
+  pub_cmd_ = this->create_publisher<LowCmd>("~/output/cmd", qos);
+  joint_state_publisher_ =
+    this->create_publisher<sensor_msgs::msg::JointState>("~/output/nn/joint_states", 1);
   stand_cmd_ = this->create_subscription<LowCmd>(
     "~/input/stand", 1,
     std::bind(&UnitreeStateMachineNode::standCallback, this, _1));
   walk_cmd_ = this->create_subscription<LowCmd>(
-    "~/input/walk", 1,
-    std::bind(&UnitreeStateMachineNode::walkCallback, this, _1));
-  pub_cmd_ = this->create_publisher<LowCmd>("~/output/cmd", 1);
+    "~/input/walk", qos,
+    std::bind(&UnitreeStateMachineNode::walkCallback, this, _1), sub_options);
   server_gait_ = this->create_service<Gait>(
     "~/service/gait",
     std::bind(
@@ -59,7 +65,6 @@ void UnitreeStateMachineNode::walkCallback(LowCmd::UniquePtr msg)
   }
   if (unitree_a1_state_machine_->getState() == unitree_a1_state_machine::State::WALK) {
     std::lock_guard<std::mutex> lock(publisherMutex);
-    RCLCPP_INFO(this->get_logger(), "Walking...");
     auto joints = sensor_msgs::msg::JointState();
     joints.header.stamp = this->now();
     joints.header.frame_id = "trunk";

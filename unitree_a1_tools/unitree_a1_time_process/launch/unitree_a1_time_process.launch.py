@@ -17,47 +17,47 @@ from launch.actions import DeclareLaunchArgument
 from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch.substitutions import PathJoinSubstitution
-from launch.substitutions import FindExecutable
 from launch_ros.actions import Node
 from launch.actions import ExecuteProcess
+from launch.substitutions import FindExecutable
 from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context, *args, **kwargs):
     rosbag_path = LaunchConfiguration('rosbag_path').perform(context)
-    param_path = LaunchConfiguration('unitree_a1_data_parser_param_file').perform(context)
+    param_path = LaunchConfiguration('unitree_a1_time_process_param_file').perform(context)
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_data_parser'), 'config', 'unitree_a1_data_parser.param.yaml']
+            [FindPackageShare('unitree_a1_time_process'), 'config', 'unitree_a1_time_process.param.yaml']
         ).perform(context)
 
-    unitree_a1_data_parser_node = Node(
-        package='unitree_a1_data_parser',
-        executable='unitree_a1_data_parser_node.py',
-        name='unitree_a1_data_parser_node',
+    unitree_a1_time_process_node = Node(
+        package='unitree_a1_time_process',
+        executable='unitree_a1_time_process_node.py',
+        name='unitree_a1_time_process_node',
         parameters=[
             param_path,
             {'rosbag_name': rosbag_path},
         ],
         remappings=[
-            ("~/action", LaunchConfiguration("action_name")),
+            ("~/nn", LaunchConfiguration("output_nn_name")),
+            ("~/gate", LaunchConfiguration("output_gate_name")),
             ("~/state", LaunchConfiguration("state_name")),
         ],
         output='screen',
         arguments=['--ros-args', '--log-level', 'info', '--enable-stdout-logs'],
         emulate_tty=True
     )
-
     rosbag_replay = ExecuteProcess(
         cmd=[[
             FindExecutable(name='ros2'),
-            f' bag play {rosbag_path} '
+            f' bag play {rosbag_path} -r 1'
         ]],
         shell=True
     )
 
     return [
-        unitree_a1_data_parser_node,
+        unitree_a1_time_process_node,
         rosbag_replay
     ]
 
@@ -70,9 +70,10 @@ def generate_launch_description():
             DeclareLaunchArgument(name, default_value=default_value)
         )
     add_launch_arg('rosbag_path')
-    add_launch_arg('unitree_a1_data_parser_param_file', '')
-    add_launch_arg('action_name', '/unitree_a1_neural_control/debug/action')
-    add_launch_arg('state_name', '/unitree_a1_neural_control/debug/tensor')
+    add_launch_arg('unitree_a1_time_process_param_file', '')
+    add_launch_arg('output_nn_name', '/unitree_a1_legged/controller/nn/cmd')
+    add_launch_arg('output_gate_name', '/unitree_a1_legged/cmd')
+    add_launch_arg('state_name', '/unitree_a1_legged/state')
 
     return LaunchDescription([
         *declared_arguments,

@@ -29,9 +29,9 @@ double calcMappingdouble(const double input, const double sensitivity)
 {
   const double exponent = 1.0 / (std::max(0.001, std::min(1.0, sensitivity)));
   if (input < 0.0) {
-    return -std::pow(input, exponent);
+    return -std::round(std::pow(input, exponent) / 0.001) * 0.001;
   }
-  return std::pow(input, exponent);
+  return std::round(std::pow(input, exponent) / 0.001) * 0.001;
 }
 
 namespace unitree_a1_legged

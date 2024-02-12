@@ -4,3 +4,4 @@
     foot_contact_threshold: 1
     kp: 50.0
     kd: 4.0
+    publish_debug: true

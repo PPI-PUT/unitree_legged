@@ -75,7 +75,7 @@ def generate_launch_description():
         )
 
     add_launch_arg('joint_control_states_name',
-                   '/unitree_a1_state_machine_node/output/nn/joint_states')
+                   '/unitree_a1_legged/nn/joint_states')
 
     return LaunchDescription([
         *declared_arguments,
