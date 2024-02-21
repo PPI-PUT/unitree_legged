@@ -1,7 +1,10 @@
+# UNITREE LAUNCH FILE
 /**:
   ros__parameters:
-    model_path: "/home/mackop/intention_policy/deployment_network_id1.pt"
-    foot_contact_threshold: 1
-    kp: 50.0
-    kd: 4.0
+    model_path: "/home/mackop/intention_policy/deployment_network_id2.pt"
+    foot_contact_threshold: 20
+    kp: 20.0
+    kd: 0.5
     publish_debug: true
+    # 20.0
+    # 0.5
