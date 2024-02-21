@@ -11,7 +11,7 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 
 include_directories(
   include
-  ${CMAKE_SOURCE_DIR}/../unitree_a1_legged/unitree_legged_sdk/include
+  ${CMAKE_SOURCE_DIR}/../unitree_a1_driver/unitree_legged_sdk/include
 )
 
 set(UNITREE_A1_EXAMPLES_LIB_SRC

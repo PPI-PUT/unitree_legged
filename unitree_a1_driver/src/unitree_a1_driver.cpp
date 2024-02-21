@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "unitree_a1_legged/unitree_a1_legged.hpp"
+#include "unitree_a1_driver/unitree_a1_driver.hpp"
 
 #include <iostream>
 
-namespace unitree_a1_legged
+namespace unitree_a1_driver
 {
 
     UnitreeLegged::UnitreeLegged()
@@ -61,4 +61,4 @@ namespace unitree_a1_legged
         low_udp_.GetRecv(low_state_);
     }
 
-}  // namespace unitree_a1_legged
+}  // namespace unitree_a1_driver

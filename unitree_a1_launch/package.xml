@@ -1,21 +1,20 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>unitree_a1_legged</name>
+  <name>unitree_a1_launch</name>
   <version>1.0.0</version>
-  <description>Unitree legged ROS2 package</description>
-  <maintainer email="maciej.krupka@student.put.poznan.pl">Maciej Krupka</maintainer>
+  <description>launcher</description>
+  <maintainer email="maciej.p.krupka@student.put.poznan.pl">Maciej Krupka</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>launch_ros</depend>
-  <depend>rclcpp</depend>
-  <depend>rclcpp_components</depend>
-  <depend>eigen</depend>
-  <depend>unitree_a1_legged_msgs</depend>
-  
-  <test_depend>ament_cmake_ros</test_depend>
+  <depend>unitree_a1_msgs</depend>
+  <depend>unitree_a1_driver</depend>
+  <depend>unitree_a1_joystick</depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

@@ -17,14 +17,14 @@
 
 #include <cstdint>
 
-#include "unitree_a1_legged/visibility_control.hpp"
+#include "unitree_a1_driver/visibility_control.hpp"
 #include "unitree_a1_legged_msgs/msg/motor_cmd.hpp"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 #include "unitree_legged_sdk/unitree_joystick.h"
 #include "unitree_legged_sdk/a1_const.h"
 using namespace UNITREE_LEGGED_SDK;
 
-namespace unitree_a1_legged
+namespace unitree_a1_driver
 {
 /**
      * @brief The motor mode for joint control.
@@ -81,6 +81,6 @@ private:
   Safety safe_;
 };
 
-}  // namespace unitree_a1_legged
+}  // namespace unitree_a1_driver
 
 #endif  // UNITREE_A1_LEGGED__UNITREE_A1_LEGGED_HPP_

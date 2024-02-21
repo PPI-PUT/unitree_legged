@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(unitree_a1_legged)
+project(unitree_a1_driver)
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies(REQUIRED
@@ -32,36 +32,36 @@ install(
 link_directories(${CMAKE_SOURCE_DIR}/unitree_legged_sdk/lib/)
 set(EXTRA_LIBS -pthread libunitree_legged_sdk_${ARCH}.so lcm)
 
-set(UNITREE_A1_LEGGED_LIB_SRC
-  src/unitree_a1_legged.cpp
-  src/unitree_a1_legged_converter.cpp
+set(UNITREE_A1_DRIVER_LIB_SRC
+  src/unitree_a1_driver.cpp
+  src/unitree_a1_driver_converter.cpp
 )
 
-set(UNITREE_A1_LEGGED_LIB_HEADERS
-  include/unitree_a1_legged/unitree_a1_legged.hpp
-  include/unitree_a1_legged/unitree_a1_legged_converter.hpp
-  include/unitree_a1_legged/visibility_control.hpp
+set(UNITREE_A1_DRIVER_LIB_HEADERS
+  include/unitree_a1_driver/unitree_a1_driver.hpp
+  include/unitree_a1_driver/unitree_a1_driver_converter.hpp
+  include/unitree_a1_driver/visibility_control.hpp
 )
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
-  ${UNITREE_A1_LEGGED_LIB_SRC}
-  ${UNITREE_A1_LEGGED_LIB_HEADERS}
+  ${UNITREE_A1_DRIVER_LIB_SRC}
+  ${UNITREE_A1_DRIVER_LIB_HEADERS}
 )
 target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
-set(UNITREE_A1_LEGGED_NODE_SRC
-  src/unitree_a1_legged_node.cpp
+set(UNITREE_A1_DRIVER_NODE_SRC
+  src/unitree_a1_driver_node.cpp
 )
 
-set(UNITREE_A1_LEGGED_NODE_HEADERS
-  include/unitree_a1_legged/unitree_a1_legged_node.hpp
+set(UNITREE_A1_DRIVER_NODE_HEADERS
+  include/unitree_a1_driver/unitree_a1_driver_node.hpp
 )
 
 ament_auto_add_library(${PROJECT_NAME}_node SHARED
-  ${UNITREE_A1_LEGGED_NODE_SRC}
-  ${UNITREE_A1_LEGGED_NODE_HEADERS}
+  ${UNITREE_A1_DRIVER_NODE_SRC}
+  ${UNITREE_A1_DRIVER_NODE_HEADERS}
 )
 rclcpp_components_register_node(${PROJECT_NAME}_node
-  PLUGIN "unitree_a1_legged::UnitreeLeggedNode"
+  PLUGIN "unitree_a1_driver::UnitreeLeggedNode"
   EXECUTABLE ${PROJECT_NAME}_node_exe
 )
 

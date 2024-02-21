@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "unitree_a1_legged/unitree_a1_legged_node.hpp"
+#include "unitree_a1_driver/unitree_a1_driver_node.hpp"
 #include <rclcpp/qos.hpp>
-namespace unitree_a1_legged
+namespace unitree_a1_driver
 {
 
 UnitreeLeggedNode::UnitreeLeggedNode(const rclcpp::NodeOptions & options)
@@ -130,8 +130,8 @@ void UnitreeLeggedNode::updateStateCallback()
   foot_force_rl_publisher_->publish(rl_msg);
 }
 
-}  // namespace unitree_a1_legged
+}  // namespace unitree_a1_driver
 
 #include "rclcpp_components/register_node_macro.hpp"
 
-RCLCPP_COMPONENTS_REGISTER_NODE(unitree_a1_legged::UnitreeLeggedNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(unitree_a1_driver::UnitreeLeggedNode)

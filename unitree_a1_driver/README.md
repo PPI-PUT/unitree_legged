@@ -1,4 +1,4 @@
-# Unitree A1 legged
+# Unitree A1 legged driver
 The Unitree A1 Legged package provides classes and utilities for interacting with Unitree robots using ROS 2. It facilitates communication with Unitree robots through UDP connections, offering the ability to send commands and receive states.
 ## Dependecies
 - [unitree_legged_sdk](https://github.com/unitreerobotics/unitree_legged_sdk.git) v3.3 

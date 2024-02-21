@@ -34,31 +34,31 @@ def action_remap(name: str, remap_str: str):
 
 
 def launch_setup(context, *args, **kwargs):
-    pkg_prefix = FindPackageShare('unitree_a1_legged_launch')
+    pkg_prefix = FindPackageShare('unitree_a1_launch')
     unitree_legged_params = PathJoinSubstitution([
         pkg_prefix,
         "config",
-        "unitree_a1_legged.param.yaml"
+        "unitree_a1_driver.param.yaml"
     ])
     unitree_legged_launch = ComposableNode(
-        package='unitree_a1_legged',
-        plugin='unitree_a1_legged::UnitreeLeggedNode',
-        name='unitree_a1_legged',
+        package='unitree_a1_driver',
+        plugin='unitree_a1_driver::UnitreeLeggedNode',
+        name='unitree_a1_driver',
         parameters=[unitree_legged_params],
         remappings=[
-                ("/unitree_a1_legged/output/state", "unitree_a1_legged/state"),
-                ("/unitree_a1_legged/output/joy", "unitree_a1_legged/sensors/joy"),
-                ("/unitree_a1_legged/input/command", "unitree_a1_legged/cmd"),
-                ("/unitree_a1_legged/output/joint_states",
+                ("/unitree_a1_driver/output/state", "unitree_a1_legged/state"),
+                ("/unitree_a1_driver/output/joy", "unitree_a1_legged/sensors/joy"),
+                ("/unitree_a1_driver/input/command", "unitree_a1_legged/cmd"),
+                ("/unitree_a1_driver/output/joint_states",
                  "unitree_a1_legged/joint_states"),
-                ("/unitree_a1_legged/output/imu", "unitree_a1_legged/sensors/imu/data_raw"),
-                ("/unitree_a1_legged/output/fl_contact",
+                ("/unitree_a1_driver/output/imu", "unitree_a1_legged/sensors/imu/data_raw"),
+                ("/unitree_a1_driver/output/fl_contact",
                  "unitree_a1_legged/sensors/contact_fl"),
-                ("/unitree_a1_legged/output/fr_contact",
+                ("/unitree_a1_driver/output/fr_contact",
                  "unitree_a1_legged/sensors/contact_fr"),
-                ("/unitree_a1_legged/output/rl_contact",
+                ("/unitree_a1_driver/output/rl_contact",
                  "unitree_a1_legged/sensors/contact_rl"),
-                ("/unitree_a1_legged/output/rr_contact",
+                ("/unitree_a1_driver/output/rr_contact",
                  "unitree_a1_legged/sensors/contact_rr"),
         ],
         extra_arguments=[{'use_intra_process_comms': True}]

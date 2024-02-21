@@ -4,7 +4,7 @@
 ## Dependecies
 ```
 vcs import < deps.repos
-cd /unitree_a1_legged/lcm
+cd /unitree_a1_driver/lcm
 mkdir build
 cd build
 cmake ../
@@ -20,7 +20,7 @@ colcon build --packages-up-to --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_EX
 
 Read the readme: 
 
-[unitree_a1_legged](./unitree_a1_legged/README.md)
+[unitree_a1_driver](./unitree_a1_driver/README.md)
 [unitree_a1_joystick](./unitree_a1_joystick/README.md)
 [unitree_a1_legged_msgs](./unitree_a1_legged_msgs/README.md)
 
@@ -58,7 +58,7 @@ If the dynamic library cannot be found, you can use the following command.
 export LD_LIBRARY_PATH=<PATH::TO::unitree_legged_sdk>/lib:$LD_LIBRARY_PATH
 ```
 
-[unitree_a1_legged](./unitree_a1_legged/README.md)
+[unitree_a1_driver](./unitree_a1_driver/README.md)
 [unitree_a1_legged_launch](./unitree_a1_legged_launch/README.md)
 [unitree_a1_joystick](./unitree_a1_joystick/README.md)
 [unitree_a1_legged_msgs](./unitree_a1_legged_msgs/README.md)

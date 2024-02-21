@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(unitree_a1_legged_launch)
+project(unitree_a1_launch)
 
 # require that dependencies from package.xml be available
 find_package(ament_cmake_auto REQUIRED)

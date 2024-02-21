@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "unitree_a1_legged/unitree_a1_legged_converter.hpp"
+#include "unitree_a1_driver/unitree_a1_driver_converter.hpp"
 
 using namespace UNITREE_LEGGED_SDK;
 
-namespace unitree_a1_legged
+namespace unitree_a1_driver
 {
 sensor_msgs::msg::Imu Converter::stateToMsg(const IMU & state)
 {
@@ -303,4 +303,4 @@ void Converter::getWrenchMsg(
   rear_left.wrench.torque.y = 0.0;
   rear_left.wrench.torque.z = 0.0;
 }
-} // namespace unitree_a1_legged
+} // namespace unitree_a1_driver

@@ -29,17 +29,17 @@ def contact_remap(remap: LaunchConfiguration, context):
 
 def launch_setup(context, *args, **kwargs):
     param_path = LaunchConfiguration(
-        'unitree_a1_legged_param_file').perform(context)
+        'unitree_a1_driver_param_file').perform(context)
     if not param_path:
         param_path = PathJoinSubstitution(
-            [FindPackageShare('unitree_a1_legged'), 'config',
-             'unitree_a1_legged.param.yaml']
+            [FindPackageShare('unitree_a1_driver'), 'config',
+             'unitree_a1_driver.param.yaml']
         ).perform(context)
 
     unitree_a1_legged_node = Node(
-        package='unitree_a1_legged',
-        executable='unitree_a1_legged_node_exe',
-        name='unitree_a1_legged_node',
+        package='unitree_a1_driver',
+        executable='unitree_a1_driver_node_exe',
+        name='unitree_a1_driver_node',
         parameters=[
             param_path
         ],
@@ -68,7 +68,7 @@ def generate_launch_description():
             DeclareLaunchArgument(name, default_value=default_value)
         )
 
-    add_launch_arg('unitree_a1_legged_param_file', '')
+    add_launch_arg('unitree_a1_driver_param_file', '')
     add_launch_arg('output_state_name', 'unitree_a1_legged/state')
     add_launch_arg('input_command_name', 'unitree_a1_legged/cmd')
     add_launch_arg('output_joy_name', 'unitree_a1_legged/joy')

@@ -18,12 +18,11 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 
-// #include "unitree_a1_legged/unitree_a1_legged.hpp"
-#include "unitree_a1_legged/unitree_a1_legged_converter.hpp"
+#include "unitree_a1_driver/unitree_a1_driver_converter.hpp"
 
-namespace unitree_a1_legged
+namespace unitree_a1_driver
 {
-using UnitreeA1LeggedPtr = std::unique_ptr<unitree_a1_legged::UnitreeLegged>;
+using UnitreeA1LeggedPtr = std::unique_ptr<unitree_a1_driver::UnitreeLegged>;
 
 class UNITREE_A1_LEGGED_PUBLIC UnitreeLeggedNode : public rclcpp::Node
 {
@@ -56,6 +55,6 @@ private:
   void receiveJointCommandCallback(const unitree_a1_legged_msgs::msg::JointCommand::SharedPtr msg);
   void updateStateCallback();
 };
-}  // namespace unitree_a1_legged
+}  // namespace unitree_a1_driver
 
 #endif  // UNITREE_A1_LEGGED__UNITREE_A1_LEGGED_NODE_HPP_

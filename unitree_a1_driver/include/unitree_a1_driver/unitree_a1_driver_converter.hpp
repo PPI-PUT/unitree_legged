@@ -10,7 +10,7 @@
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/joy.hpp>
 
-#include "unitree_a1_legged/unitree_a1_legged.hpp"
+#include "unitree_a1_driver/unitree_a1_driver.hpp"
 #include "unitree_a1_legged_msgs/msg/low_cmd.hpp"
 #include "unitree_a1_legged_msgs/msg/low_state.hpp"
 #include "unitree_a1_legged_msgs/msg/motor_cmd.hpp"
@@ -20,7 +20,7 @@
 #include "unitree_a1_legged_msgs/msg/foot_force_state.hpp"
 #include "unitree_a1_legged_msgs/msg/joint_command.hpp"
 
-namespace unitree_a1_legged
+namespace unitree_a1_driver
 {
 
 /**
@@ -92,4 +92,4 @@ public:
     geometry_msgs::msg::WrenchStamped & rear_right,
     geometry_msgs::msg::WrenchStamped & rear_left);
 };
-} // namespace unitree_a1_legged
+} // namespace unitree_a1_driver
