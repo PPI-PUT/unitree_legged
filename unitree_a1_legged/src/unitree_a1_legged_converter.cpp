@@ -77,8 +77,8 @@ unitree_a1_legged_msgs::msg::MotorState Converter::stateToMsg(const MotorState &
 unitree_a1_legged_msgs::msg::FootForceState Converter::stateToMsg(const int16_t state[4])
 {
   unitree_a1_legged_msgs::msg::FootForceState msg;
-  msg.front_left = state[FR_];
-  msg.front_right = state[FL_];
+  msg.front_left = state[FL_];
+  msg.front_right = state[FR_];
   msg.rear_right = state[RR_];
   msg.rear_left = state[RL_];
   return msg;
