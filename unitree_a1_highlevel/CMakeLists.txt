@@ -36,20 +36,9 @@ ament_auto_add_library(${PROJECT_NAME}_node SHARED
   ${UNITREE_A1_HIGHLEVEL_NODE_HEADERS}
 )
 rclcpp_components_register_node(${PROJECT_NAME}_node
-  PLUGIN "unitree_a1_highlevel::UnitreeA1HighlevelNode"
+  PLUGIN "unitree_a1_highlevel::UnitreeStateMachineNode"
   EXECUTABLE ${PROJECT_NAME}_node_exe
 )
-
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
-
-  ament_add_ros_isolated_gtest(test_unitree_a1_highlevel
-    test/test_unitree_a1_highlevel.cpp
-  )
-  ament_target_dependencies(test_unitree_a1_highlevel ${TEST_SOURCES})
-  target_link_libraries(test_unitree_a1_highlevel ${PROJECT_NAME})
-endif()
 
 ament_auto_package(INSTALL_TO_SHARE
   launch

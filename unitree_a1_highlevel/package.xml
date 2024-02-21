@@ -3,16 +3,20 @@
 <package format="3">
   <name>unitree_a1_highlevel</name>
   <version>1.0.0</version>
-  <description>INSERT_DESCRIPTION</description>
-  <maintainer email="maciej.krupka@gmail.com">Maciej Krupka</maintainer>
+  <description>Unitree finite state machine</description>
+  <maintainer email="maciej.p.krupka@student.put.poznan.pl">Maciej Krupka</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>launch_ros</depend>
   <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
   <depend>rclcpp_components</depend>
-
+  <depend>unitree_a1_legged_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_srvs</depend>
+  
   <test_depend>ament_cmake_ros</test_depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

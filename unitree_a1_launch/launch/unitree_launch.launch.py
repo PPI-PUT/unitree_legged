@@ -87,28 +87,28 @@ def launch_setup(context, *args, **kwargs):
     state_machine = PathJoinSubstitution([
         pkg_prefix,
         "config",
-        "unitree_a1_state_machine.param.yaml"
+        "unitree_a1_highlevel.param.yaml"
     ])
     state_machine_component = ComposableNode(
-        package='unitree_a1_state_machine',
-        plugin='unitree_a1_state_machine::UnitreeStateMachineNode',
-        name='unitree_a1_state_machine',
+        package='unitree_a1_highlevel',
+        plugin='unitree_a1_highlevel::UnitreeStateMachineNode',
+        name='unitree_a1_highlevel',
         parameters=[state_machine],
         remappings=[
-            ("/unitree_a1_state_machine/input/walk",
+            ("/unitree_a1_highlevel/input/walk",
              "/unitree_a1_legged/controller/nn/cmd"),
-            ("/unitree_a1_state_machine/input/stand",
+            ("/unitree_a1_highlevel/input/stand",
              "/unitree_a1_legged/controller/fixed_stand/cmd"),
-            ("/unitree_a1_state_machine/output/cmd", "/unitree_a1_legged/cmd"),
-            ("/unitree_a1_state_machine/output/nn/joint_states",
+            ("/unitree_a1_highlevel/output/cmd", "/unitree_a1_legged/cmd"),
+            ("/unitree_a1_highlevel/output/nn/joint_states",
              "/unitree_a1_legged/nn/joint_states"),
             ("service_stand_name", "/unitree_a1_legged/stand"),
-            ("/unitree_a1_state_machine/service/reset_controller",
+            ("/unitree_a1_highlevel/service/reset_controller",
              "/unitree_a1_legged/nn/reset_controller"),
-            ("/unitree_a1_state_machine/service/gait",
+            ("/unitree_a1_highlevel/service/gait",
              "unitree_a1_legged/service/gait"),
 
-        ] + action_remap('unitree_a1_state_machine/action/fixed_stand', '/unitree_a1_legged/stand'),
+        ] + action_remap('unitree_a1_highlevel/action/fixed_stand', '/unitree_a1_legged/stand'),
         extra_arguments=[{'use_intra_process_comms': True}]
     )
     stand_params = PathJoinSubstitution([
@@ -123,7 +123,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[stand_params],
         remappings=[
             ("/unitree_a1_fixed_stand_server/output/cmd",
-             "/unitree_a1_legged/controller/fixed_stand/cmd"),
+             "/unitree_a1_legged/cmd"),
             ("/unitree_a1_fixed_stand_server/input/state", "/unitree_a1_legged/state"),
             ("service_name", "/unitree_a1_legged/stand"),
         ] + action_remap('unitree_a1_fixed_stand_server/action/fixed_stand', '/unitree_a1_legged/stand'),

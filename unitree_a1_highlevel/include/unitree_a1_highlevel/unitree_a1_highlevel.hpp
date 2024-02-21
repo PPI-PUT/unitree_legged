@@ -1,4 +1,4 @@
-// Copyright 2024 Maciej Krupka
+// Copyright 2023 Maciej Krupka
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef UNITREE_A1_HIGHLEVEL__UNITREE_A1_HIGHLEVEL_HPP_
-#define UNITREE_A1_HIGHLEVEL__UNITREE_A1_HIGHLEVEL_HPP_
+#ifndef UNITREE_A1_STATE_MACHINE__UNITREE_A1_STATE_MACHINE_HPP_
+#define UNITREE_A1_STATE_MACHINE__UNITREE_A1_STATE_MACHINE_HPP_
 
 #include <cstdint>
 
 #include "unitree_a1_highlevel/visibility_control.hpp"
-
-
+#include <unitree_a1_legged_msgs/srv/gait.hpp>
+#include <unitree_a1_legged_msgs/action/fixed_stand.hpp>
+#include <unitree_a1_legged_msgs/msg/low_cmd.hpp>
 namespace unitree_a1_highlevel
 {
+enum class State
+{
+  UNKNOWN,
+  STOP,
+  STAND,
+  HOLD,
+  WALK
+};
 
-class UNITREE_A1_HIGHLEVEL_PUBLIC UnitreeA1Highlevel
+class UNITREE_A1_STATE_MACHINE_PUBLIC UnitreeStateMachine
 {
 public:
-  UnitreeA1Highlevel();
-  int64_t foo(int64_t bar) const;
+  UnitreeStateMachine();
+  void nextState();
+  State getState() const;
+  void setState(State state);
+
+private:
+  State state_;
 };
 
 }  // namespace unitree_a1_highlevel
 
-#endif  // UNITREE_A1_HIGHLEVEL__UNITREE_A1_HIGHLEVEL_HPP_
+#endif  // UNITREE_A1_STATE_MACHINE__UNITREE_A1_STATE_MACHINE_HPP_

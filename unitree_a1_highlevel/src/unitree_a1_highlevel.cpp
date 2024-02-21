@@ -1,4 +1,4 @@
-// Copyright 2024 Maciej Krupka
+// Copyright 2023 Maciej Krupka
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,22 @@
 namespace unitree_a1_highlevel
 {
 
-UnitreeA1Highlevel::UnitreeA1Highlevel()
+UnitreeStateMachine::UnitreeStateMachine()
 {
+  state_ = State::UNKNOWN;
 }
 
-int64_t UnitreeA1Highlevel::foo(int64_t bar) const
+void UnitreeStateMachine::nextState()
 {
-  std::cout << "Hello World, " << bar << std::endl;
-  return bar;
+  state_ = static_cast<State>(static_cast<int>(state_) + 1);
+}
+State UnitreeStateMachine::getState() const
+{
+  return state_;
+}
+void UnitreeStateMachine::setState(State state)
+{
+  state_ = state;
 }
 
 }  // namespace unitree_a1_highlevel

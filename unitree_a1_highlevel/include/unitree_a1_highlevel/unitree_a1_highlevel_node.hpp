@@ -1,4 +1,4 @@
-// Copyright 2024 Maciej Krupka
+// Copyright 2023 Maciej Krupka
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef UNITREE_A1_HIGHLEVEL__UNITREE_A1_HIGHLEVEL_NODE_HPP_
-#define UNITREE_A1_HIGHLEVEL__UNITREE_A1_HIGHLEVEL_NODE_HPP_
+#ifndef UNITREE_A1_STATE_MACHINE__UNITREE_A1_STATE_MACHINE_NODE_HPP_
+#define UNITREE_A1_STATE_MACHINE__UNITREE_A1_STATE_MACHINE_NODE_HPP_
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-
+#include "rclcpp_action/rclcpp_action.hpp"
 #include "unitree_a1_highlevel/unitree_a1_highlevel.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
+#include <std_srvs/srv/trigger.hpp>
 
 namespace unitree_a1_highlevel
 {
-using UnitreeA1HighlevelPtr = std::unique_ptr<unitree_a1_highlevel::UnitreeA1Highlevel>;
+using UnitreeStateMachinePtr = std::unique_ptr<unitree_a1_highlevel::UnitreeStateMachine>;
+using FixedStand = unitree_a1_legged_msgs::action::FixedStand;
+using FixedStandGoal = rclcpp_action::ClientGoalHandle<FixedStand>;
+using Gait = unitree_a1_legged_msgs::srv::Gait;
+using LowCmd = unitree_a1_legged_msgs::msg::LowCmd;
+using Trigger = std_srvs::srv::Trigger;
+using namespace std::placeholders;
 
-class UNITREE_A1_HIGHLEVEL_PUBLIC UnitreeA1HighlevelNode : public rclcpp::Node
+class UNITREE_A1_STATE_MACHINE_PUBLIC UnitreeStateMachineNode : public rclcpp::Node
 {
 public:
-  explicit UnitreeA1HighlevelNode(const rclcpp::NodeOptions & options);
+  explicit UnitreeStateMachineNode(const rclcpp::NodeOptions & options);
 
 private:
-  UnitreeA1HighlevelPtr unitree_a1_highlevel_{nullptr};
-  int64_t param_name_{123};
+  std::mutex publisherMutex;
+  UnitreeStateMachinePtr unitree_a1_state_machine_{nullptr};
+  rclcpp::Service<Gait>::SharedPtr server_gait_;
+  rclcpp_action::Client<FixedStand>::SharedPtr fixed_stand_client_;
+  rclcpp::Subscription<LowCmd>::SharedPtr stand_cmd_;
+  LowCmd::SharedPtr stand_cmd_msg_;
+  void standCallback(LowCmd::UniquePtr msg);
+  rclcpp::Subscription<LowCmd>::SharedPtr walk_cmd_;
+  LowCmd::SharedPtr walk_cmd_msg_;
+  void walkCallback(LowCmd::UniquePtr msg);
+  rclcpp::Publisher<LowCmd>::SharedPtr pub_cmd_;
+  rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;
+  void controlLoop();
+  void resultCallback(const FixedStandGoal::WrappedResult & result);
+  void handleGait(
+    const std::shared_ptr<Gait::Request> request,
+    std::shared_ptr<Gait::Response> response);
+  rclcpp::Client<Trigger>::SharedPtr client_reset_controller_;
 };
 }  // namespace unitree_a1_highlevel
 
-#endif  // UNITREE_A1_HIGHLEVEL__UNITREE_A1_HIGHLEVEL_NODE_HPP_
+#endif  // UNITREE_A1_STATE_MACHINE__UNITREE_A1_STATE_MACHINE_NODE_HPP_

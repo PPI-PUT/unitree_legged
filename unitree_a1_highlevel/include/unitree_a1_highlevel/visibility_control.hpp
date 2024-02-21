@@ -1,4 +1,4 @@
-// Copyright 2024 Maciej Krupka
+// Copyright 2023 Maciej Krupka
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef UNITREE_A1_HIGHLEVEL__VISIBILITY_CONTROL_HPP_
-#define UNITREE_A1_HIGHLEVEL__VISIBILITY_CONTROL_HPP_
+#ifndef UNITREE_A1_STATE_MACHINE__VISIBILITY_CONTROL_HPP_
+#define UNITREE_A1_STATE_MACHINE__VISIBILITY_CONTROL_HPP_
 
 ////////////////////////////////////////////////////////////////////////////////
 #if defined(__WIN32)
-  #if defined(UNITREE_A1_HIGHLEVEL_BUILDING_DLL) || defined(UNITREE_A1_HIGHLEVEL_EXPORTS)
-    #define UNITREE_A1_HIGHLEVEL_PUBLIC __declspec(dllexport)
-    #define UNITREE_A1_HIGHLEVEL_LOCAL
-  #else  // defined(UNITREE_A1_HIGHLEVEL_BUILDING_DLL) || defined(UNITREE_A1_HIGHLEVEL_EXPORTS)
-    #define UNITREE_A1_HIGHLEVEL_PUBLIC __declspec(dllimport)
-    #define UNITREE_A1_HIGHLEVEL_LOCAL
-  #endif  // defined(UNITREE_A1_HIGHLEVEL_BUILDING_DLL) || defined(UNITREE_A1_HIGHLEVEL_EXPORTS)
+  #if defined(UNITREE_A1_STATE_MACHINE_BUILDING_DLL) || defined(UNITREE_A1_STATE_MACHINE_EXPORTS)
+    #define UNITREE_A1_STATE_MACHINE_PUBLIC __declspec(dllexport)
+    #define UNITREE_A1_STATE_MACHINE_LOCAL
+  #else  // defined(UNITREE_A1_STATE_MACHINE_BUILDING_DLL) || defined(UNITREE_A1_STATE_MACHINE_EXPORTS)
+    #define UNITREE_A1_STATE_MACHINE_PUBLIC __declspec(dllimport)
+    #define UNITREE_A1_STATE_MACHINE_LOCAL
+  #endif  // defined(UNITREE_A1_STATE_MACHINE_BUILDING_DLL) || defined(UNITREE_A1_STATE_MACHINE_EXPORTS)
 #elif defined(__linux__)
-  #define UNITREE_A1_HIGHLEVEL_PUBLIC __attribute__((visibility("default")))
-  #define UNITREE_A1_HIGHLEVEL_LOCAL __attribute__((visibility("hidden")))
+  #define UNITREE_A1_STATE_MACHINE_PUBLIC __attribute__((visibility("default")))
+  #define UNITREE_A1_STATE_MACHINE_LOCAL __attribute__((visibility("hidden")))
 #elif defined(__APPLE__)
-  #define UNITREE_A1_HIGHLEVEL_PUBLIC __attribute__((visibility("default")))
-  #define UNITREE_A1_HIGHLEVEL_LOCAL __attribute__((visibility("hidden")))
+  #define UNITREE_A1_STATE_MACHINE_PUBLIC __attribute__((visibility("default")))
+  #define UNITREE_A1_STATE_MACHINE_LOCAL __attribute__((visibility("hidden")))
 #else
   #error "Unsupported Build Configuration"
 #endif
 
-#endif  // UNITREE_A1_HIGHLEVEL__VISIBILITY_CONTROL_HPP_
+#endif  // UNITREE_A1_STATE_MACHINE__VISIBILITY_CONTROL_HPP_
