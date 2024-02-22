@@ -5,4 +5,5 @@ uint8 FIXED_STAND=30
 uint8 NEURAL=40
 uint8 HOLD=45
 uint8 UNKNOWN=50
+uint8 WARN_DELAY=60
 uint8 type
