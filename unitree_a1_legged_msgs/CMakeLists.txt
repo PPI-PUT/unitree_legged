@@ -30,6 +30,7 @@ set(msg_files
     "msg/MotorState.msg"
     "msg/QuadrupedCmd.msg"
     "msg/QuadrupedState.msg"
+    "msg/TwistStamped.msg"
     "msg/UnitreeHeader.msg"
     "srv/Gait.srv"
     "action/FixedStand.action"
