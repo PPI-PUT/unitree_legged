@@ -21,56 +21,67 @@ namespace unitree_a1_fixed_stand_server
 
 UnitreeFixedStandServer::UnitreeFixedStandServer()
 {
-  this->reset();
   this->initParams();
 }
 
-void UnitreeFixedStandServer::fixedStand(LowState::SharedPtr state)
+LowCmd UnitreeFixedStandServer::fixedStand(
+  const QuadrupedState & motor_state,
+  const builtin_interfaces::msg::Time & stamp,
+  float & percent)
 {
-  this->initPose(state);
+  auto lowCmd = LowCmd();
+  lowCmd.header.stamp = stamp;
+  this->initPose(motor_state);
   auto targetPos = std::vector<float>(lastPos_.size(), 0.0);
   if (motiontime_ < steps_) {
     motiontime_++;
-    percent_ = static_cast<float>(motiontime_) / steps_;
+    percent = static_cast<float>(motiontime_) / steps_;
     for (size_t i = 0; i < targetPos.size(); i++) {
       targetPos[i] = this->jointLinearInterpolation(
         lastPos_[i], standPos_[i],
-        percent_);
+        percent);
     }
-    this->targetToCmd(targetPos);
+    percent = percent * 100;
+    auto setpoint = this->initStandGains();
+    this->targetToCmd(setpoint, targetPos);
+    lowCmd.common.mode = 0x0A;
+    lowCmd.motor_cmd = setpoint;
   }
+  return lowCmd;
 }
 
-float UnitreeFixedStandServer::getPercent() const
+LowCmd UnitreeFixedStandServer::holdPosition(
+  const QuadrupedState & state, const builtin_interfaces::msg::Time & stamp)
 {
-  return percent_;
-}
-
-QuadrupedCmd UnitreeFixedStandServer::getCmd() const
-{
-  return cmd_;
+  LowCmd lowCmd;
+  lowCmd.common.mode = 0x0A;
+  lowCmd.header.stamp = stamp;
+  auto hold_position = this->quadrupedStatetoVector(state);
+  auto setpoint = this->initHoldGains();
+  this->targetToCmd(setpoint, hold_position);
+  lowCmd.motor_cmd = setpoint;
+  return lowCmd;
 }
 
 void UnitreeFixedStandServer::reset()
 {
-  init_ = true;
-  std::fill(lastPos_.begin(), lastPos_.end(), 0.0);
+  this->initParams();
 }
 
-void UnitreeFixedStandServer::targetToCmd(const std::vector<float> & targetPos)
+void UnitreeFixedStandServer::targetToCmd(QuadrupedCmd & cmd, const std::vector<float> & targetPos)
 {
-  cmd_.front_right.hip.q = targetPos[0];
-  cmd_.front_right.thigh.q = targetPos[1];
-  cmd_.front_right.calf.q = targetPos[2];
-  cmd_.front_left.hip.q = targetPos[3];
-  cmd_.front_left.thigh.q = targetPos[4];
-  cmd_.front_left.calf.q = targetPos[5];
-  cmd_.rear_right.hip.q = targetPos[6];
-  cmd_.rear_right.thigh.q = targetPos[7];
-  cmd_.rear_right.calf.q = targetPos[8];
-  cmd_.rear_left.hip.q = targetPos[9];
-  cmd_.rear_left.thigh.q = targetPos[10];
-  cmd_.rear_left.calf.q = targetPos[11];
+  cmd.front_right.hip.q = targetPos[0];
+  cmd.front_right.thigh.q = targetPos[1];
+  cmd.front_right.calf.q = targetPos[2];
+  cmd.front_left.hip.q = targetPos[3];
+  cmd.front_left.thigh.q = targetPos[4];
+  cmd.front_left.calf.q = targetPos[5];
+  cmd.rear_right.hip.q = targetPos[6];
+  cmd.rear_right.thigh.q = targetPos[7];
+  cmd.rear_right.calf.q = targetPos[8];
+  cmd.rear_left.hip.q = targetPos[9];
+  cmd.rear_left.thigh.q = targetPos[10];
+  cmd.rear_left.calf.q = targetPos[11];
 }
 
 double UnitreeFixedStandServer::jointLinearInterpolation(
@@ -83,67 +94,103 @@ double UnitreeFixedStandServer::jointLinearInterpolation(
   return p;
 }
 
-void UnitreeFixedStandServer::initPose(LowState::SharedPtr state)
+void UnitreeFixedStandServer::initPose(const QuadrupedState & state)
 {
   if (init_) {
-    lastPos_[0] = state->motor_state.front_right.hip.q;
-    lastPos_[1] = state->motor_state.front_right.thigh.q;
-    lastPos_[2] = state->motor_state.front_right.calf.q;
-    lastPos_[3] = state->motor_state.front_left.hip.q;
-    lastPos_[4] = state->motor_state.front_left.thigh.q;
-    lastPos_[5] = state->motor_state.front_left.calf.q;
-    lastPos_[6] = state->motor_state.rear_right.hip.q;
-    lastPos_[7] = state->motor_state.rear_right.thigh.q;
-    lastPos_[8] = state->motor_state.rear_right.calf.q;
-    lastPos_[9] = state->motor_state.rear_left.hip.q;
-    lastPos_[10] = state->motor_state.rear_left.thigh.q;
-    lastPos_[11] = state->motor_state.rear_left.calf.q;
+    lastPos_[0] = state.front_right.hip.q;
+    lastPos_[1] = state.front_right.thigh.q;
+    lastPos_[2] = state.front_right.calf.q;
+    lastPos_[3] = state.front_left.hip.q;
+    lastPos_[4] = state.front_left.thigh.q;
+    lastPos_[5] = state.front_left.calf.q;
+    lastPos_[6] = state.rear_right.hip.q;
+    lastPos_[7] = state.rear_right.thigh.q;
+    lastPos_[8] = state.rear_right.calf.q;
+    lastPos_[9] = state.rear_left.hip.q;
+    lastPos_[10] = state.rear_left.thigh.q;
+    lastPos_[11] = state.rear_left.calf.q;
     init_ = false;
   }
+}
+
+std::vector<float> UnitreeFixedStandServer::quadrupedStatetoVector(const QuadrupedState & state)
+{
+  std::vector<float> vec;
+  vec.push_back(state.front_right.hip.q);
+  vec.push_back(state.front_right.thigh.q);
+  vec.push_back(state.front_right.calf.q);
+  vec.push_back(state.front_left.hip.q);
+  vec.push_back(state.front_left.thigh.q);
+  vec.push_back(state.front_left.calf.q);
+  vec.push_back(state.rear_right.hip.q);
+  vec.push_back(state.rear_right.thigh.q);
+  vec.push_back(state.rear_right.calf.q);
+  vec.push_back(state.rear_left.hip.q);
+  vec.push_back(state.rear_left.thigh.q);
+  vec.push_back(state.rear_left.calf.q);
+  return vec;
+
 }
 
 void UnitreeFixedStandServer::initParams()
 {
   steps_ = 500.0;
-  percent_ = 0.0;
-  motiontime_ = 1;
-  hip_kp_ = 70.0;
-  hip_kd_ = 3.0;
-  thigh_kp_ = 180.0;
-  thigh_kd_ = 8.0;
-  calf_kp_ = 300.0;
-  calf_kd_ = 15.0;
-  percent_ = 0.0;
   motiontime_ = 1;
   standPos_ = {-0.1, 0.8, -1.5, 0.1, 0.8, -1.5,
     -0.1, 1.0, -1.5, 0.1, 1.0, -1.5};
+  std::fill(lastPos_.begin(), lastPos_.end(), 0.0);
+  init_ = true;
+}
 
-  cmd_.front_right.hip.kp = hip_kp_;
-  cmd_.front_right.hip.kd = hip_kd_;
-  cmd_.front_left.hip.kp = hip_kp_;
-  cmd_.front_left.hip.kd = hip_kd_;
-  cmd_.rear_right.hip.kp = hip_kp_;
-  cmd_.rear_right.hip.kd = hip_kd_;
-  cmd_.rear_left.hip.kp = hip_kp_;
-  cmd_.rear_left.hip.kd = hip_kd_;
+QuadrupedCmd UnitreeFixedStandServer::initStandGains()
+{
+  float hip_kp = 70.0;
+  float hip_kd = 3.0;
+  float thigh_kp = 180.0;
+  float thigh_kd = 8.0;
+  float calf_kp = 300.0;
+  float calf_kd = 15.0;
+  return this->initGains(hip_kp, hip_kd, thigh_kp, thigh_kd, calf_kp, calf_kd);
+}
+QuadrupedCmd UnitreeFixedStandServer::initHoldGains()
+{
+  float kp = 20.0;
+  float kd = 0.5;
+  return this->initGains(kp, kd, kp, kd, kp, kd);
+}
 
-  cmd_.front_right.thigh.kp = thigh_kp_;
-  cmd_.front_right.thigh.kd = thigh_kd_;
-  cmd_.front_left.thigh.kp = thigh_kp_;
-  cmd_.front_left.thigh.kd = thigh_kd_;
-  cmd_.rear_right.thigh.kp = thigh_kp_;
-  cmd_.rear_right.thigh.kd = thigh_kd_;
-  cmd_.rear_left.thigh.kp = thigh_kp_;
-  cmd_.rear_left.thigh.kd = thigh_kd_;
+QuadrupedCmd UnitreeFixedStandServer::initGains(
+  float hip_kp, float hip_kd, float thigh_kp,
+  float thigh_kd, float calf_kp, float calf_kd)
+{
+  QuadrupedCmd cmd;
+  cmd.front_right.hip.kp = hip_kp;
+  cmd.front_right.hip.kd = hip_kd;
+  cmd.front_left.hip.kp = hip_kp;
+  cmd.front_left.hip.kd = hip_kd;
+  cmd.rear_right.hip.kp = hip_kp;
+  cmd.rear_right.hip.kd = hip_kd;
+  cmd.rear_left.hip.kp = hip_kp;
+  cmd.rear_left.hip.kd = hip_kd;
 
-  cmd_.front_right.calf.kp = calf_kp_;
-  cmd_.front_right.calf.kd = calf_kd_;
-  cmd_.front_left.calf.kp = calf_kp_;
-  cmd_.front_left.calf.kd = calf_kd_;
-  cmd_.rear_right.calf.kp = calf_kp_;
-  cmd_.rear_right.calf.kd = calf_kd_;
-  cmd_.rear_left.calf.kp = calf_kp_;
-  cmd_.rear_left.calf.kd = calf_kd_;
+  cmd.front_right.thigh.kp = thigh_kp;
+  cmd.front_right.thigh.kd = thigh_kd;
+  cmd.front_left.thigh.kp = thigh_kp;
+  cmd.front_left.thigh.kd = thigh_kd;
+  cmd.rear_right.thigh.kp = thigh_kp;
+  cmd.rear_right.thigh.kd = thigh_kd;
+  cmd.rear_left.thigh.kp = thigh_kp;
+  cmd.rear_left.thigh.kd = thigh_kd;
+
+  cmd.front_right.calf.kp = calf_kp;
+  cmd.front_right.calf.kd = calf_kd;
+  cmd.front_left.calf.kp = calf_kp;
+  cmd.front_left.calf.kd = calf_kd;
+  cmd.rear_right.calf.kp = calf_kp;
+  cmd.rear_right.calf.kd = calf_kd;
+  cmd.rear_left.calf.kp = calf_kp;
+  cmd.rear_left.calf.kd = calf_kd;
+  return cmd;
 }
 
 }  // namespace unitree_a1_fixed_stand_server

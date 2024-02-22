@@ -47,7 +47,11 @@ def launch_setup(context, *args, **kwargs):
         remappings=[
             ("~/output/cmd", LaunchConfiguration("output_cmd_name")),
             ("~/input/state", LaunchConfiguration("input_state_name")),
-        ] + action_remap('~/action/fixed_stand', LaunchConfiguration("service_stand_name"), context),
+        ] + action_remap('~/action/fixed_stand',
+                         LaunchConfiguration("action_stand_name"), context) +
+        action_remap('~/action/hold_position',
+                     LaunchConfiguration("action_hold_position"), context),
+
         output='screen',
         arguments=['--ros-args', '--log-level',
                    'info', '--enable-stdout-logs'],
@@ -69,7 +73,8 @@ def generate_launch_description():
     add_launch_arg('unitree_a1_fixed_stand_server_param_file', '')
     add_launch_arg('output_cmd_name', '/unitree_a1_legged/cmd')
     add_launch_arg('input_state_name', '/unitree_a1_legged/state')
-    add_launch_arg('service_stand_name', '/unitree_a1_legged/stand')
+    add_launch_arg('action_stand_name', '/unitree_a1_legged/stand')
+    add_launch_arg('action_hold_position', '/unitree_a1_legged/hold_position')
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)

@@ -36,5 +36,23 @@ void UnitreeStateMachine::setState(State state)
 {
   state_ = state;
 }
+uint8_t UnitreeStateMachine::getControllerType() const
+{
+  switch (state_)
+  {
+  case State::UNKNOWN:
+    return unitree_a1_legged_msgs::msg::ControllerType::UNKNOWN;
+  case State::STOP:
+    return unitree_a1_legged_msgs::msg::ControllerType::STOP;
+  case State::STAND:
+    return unitree_a1_legged_msgs::msg::ControllerType::FIXED_STAND;
+  case State::HOLD:
+    return unitree_a1_legged_msgs::msg::ControllerType::HOLD;
+  case State::WALK:
+    return unitree_a1_legged_msgs::msg::ControllerType::NEURAL;
+  default:
+    return unitree_a1_legged_msgs::msg::ControllerType::ZERO;
+  }
+}
 
 }  // namespace unitree_a1_highlevel

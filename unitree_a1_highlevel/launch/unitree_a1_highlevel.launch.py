@@ -44,14 +44,13 @@ def launch_setup(context, *args, **kwargs):
             param_path
         ],
         remappings=[
-            ("~/input/walk", LaunchConfiguration("input_walk_name")),
-            ("~/input/stand", LaunchConfiguration("input_stand_name")),
+            ("~/output/twist", LaunchConfiguration("output_twist_name")),
             ("~/output/cmd", LaunchConfiguration("output_command_name")),
             ("~/service/gait", LaunchConfiguration("service_gait_name")),
-            ("~/service/reset_controller",
-             LaunchConfiguration("service_reset_name"))
         ] + action_remap('~/action/fixed_stand',
-                         LaunchConfiguration("service_stand_name"), context),
+                         LaunchConfiguration("action_stand_name"), context) +
+        action_remap('~/action/hold_position',
+                     LaunchConfiguration("action_hold_position"), context),
         output='screen',
         arguments=['--ros-args', '--log-level',
                    'info', '--enable-stdout-logs'],
@@ -71,12 +70,11 @@ def generate_launch_description():
         )
 
     add_launch_arg('unitree_a1_highlevel_param_file', '')
-    add_launch_arg('input_walk_name', '/unitree_a1_legged/nn/cmd')
-    add_launch_arg('input_stand_name', '/unitree_a1_legged/fixed_stand/cmd')
-    add_launch_arg('output_command_name', '/unitree_a1_legged/cmd')
+    add_launch_arg('output_twist_name',
+                   '/unitree_a1_legged/controllers/cmd_vel')
     add_launch_arg('service_gait_name', '/unitree_a1_legged/gait')
-    add_launch_arg('service_stand_name', '/unitree_a1_legged/stand')
-    add_launch_arg('service_reset_name', '/unitree_a1_legged/service/reset')
+    add_launch_arg('action_stand_name', '/unitree_a1_legged/stand')
+    add_launch_arg('action_hold_position', '/unitree_a1_legged/hold_position')
     return LaunchDescription([
         *declared_arguments,
         OpaqueFunction(function=launch_setup)

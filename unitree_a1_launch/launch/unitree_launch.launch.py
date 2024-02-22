@@ -46,12 +46,14 @@ def launch_setup(context, *args, **kwargs):
         name='unitree_a1_driver',
         parameters=[unitree_legged_params],
         remappings=[
-                ("/unitree_a1_driver/output/state", "unitree_a1_legged/state"),
-                ("/unitree_a1_driver/output/joy", "unitree_a1_legged/sensors/joy"),
-                ("/unitree_a1_driver/input/command", "unitree_a1_legged/cmd"),
+                ("/unitree_a1_driver/output/state", "/unitree_a1_legged/state"),
+                ("/unitree_a1_driver/output/joy",
+                 "/unitree_a1_legged/sensors/joy/data"),
+                ("/unitree_a1_driver/input/command", "/unitree_a1_legged/cmd"),
                 ("/unitree_a1_driver/output/joint_states",
                  "unitree_a1_legged/joint_states"),
-                ("/unitree_a1_driver/output/imu", "unitree_a1_legged/sensors/imu/data_raw"),
+                ("/unitree_a1_driver/output/imu",
+                 "unitree_a1_legged/sensors/imu/data_raw"),
                 ("/unitree_a1_driver/output/fl_contact",
                  "unitree_a1_legged/sensors/contact_fl"),
                 ("/unitree_a1_driver/output/fr_contact",
@@ -77,7 +79,7 @@ def launch_setup(context, *args, **kwargs):
                 ("/unitree_a1_joystick/output/cmd_vel",
                  "unitree_a1_legged/sensors/joy/cmd_vel"),
                 ("/unitree_a1_joystick/input/joy",
-                 "/unitree_a1_legged/sensors/joy"),
+                 "/unitree_a1_legged/sensors/joy/data"),
             ("/unitree_a1_joystick/service/gait",
                     "/unitree_a1_legged/service/gait")
         ],
@@ -95,20 +97,15 @@ def launch_setup(context, *args, **kwargs):
         name='unitree_a1_highlevel',
         parameters=[state_machine],
         remappings=[
-            ("/unitree_a1_highlevel/input/walk",
-             "/unitree_a1_legged/controller/nn/cmd"),
-            ("/unitree_a1_highlevel/input/stand",
-             "/unitree_a1_legged/controller/fixed_stand/cmd"),
-            ("/unitree_a1_highlevel/output/cmd", "/unitree_a1_legged/cmd"),
-            ("/unitree_a1_highlevel/output/nn/joint_states",
-             "/unitree_a1_legged/nn/joint_states"),
-            ("service_stand_name", "/unitree_a1_legged/stand"),
-            ("/unitree_a1_highlevel/service/reset_controller",
-             "/unitree_a1_legged/nn/reset_controller"),
+            ("/unitree_a1_highlevel/input/twist",
+             "/unitree_a1_legged/sensors/joy/cmd_vel"),
+            ("/unitree_a1_highlevel/output/twist",
+             "unitree_a1_legged/controllers/cmd_vel"),
             ("/unitree_a1_highlevel/service/gait",
              "unitree_a1_legged/service/gait"),
-
-        ] + action_remap('unitree_a1_highlevel/action/fixed_stand', '/unitree_a1_legged/stand'),
+        ] + action_remap('/unitree_a1_highlevel/action/fixed_stand', '/unitree_a1_legged/action/stand') +
+        action_remap('/unitree_a1_highlevel/action/fixed_stand',
+                     '/unitree_a1_legged/action/stand'),
         extra_arguments=[{'use_intra_process_comms': True}]
     )
     stand_params = PathJoinSubstitution([
@@ -126,7 +123,10 @@ def launch_setup(context, *args, **kwargs):
              "/unitree_a1_legged/cmd"),
             ("/unitree_a1_fixed_stand_server/input/state", "/unitree_a1_legged/state"),
             ("service_name", "/unitree_a1_legged/stand"),
-        ] + action_remap('unitree_a1_fixed_stand_server/action/fixed_stand', '/unitree_a1_legged/stand'),
+        ] + action_remap('unitree_a1_fixed_stand_server/action/fixed_stand',
+                         '/unitree_a1_legged/action/stand') +
+        action_remap('unitree_a1_fixed_stand_server/action/hold_position',
+                     '/unitree_a1_legged/action/hold_position'),
         extra_arguments=[{'use_intra_process_comms': True}]
     )
     neural_params = PathJoinSubstitution([
@@ -141,14 +141,12 @@ def launch_setup(context, *args, **kwargs):
         parameters=[neural_params],
         remappings=[
             ("/unitree_a1_neural_control/input/cmd_vel",
-             "/unitree_a1_legged/sensors/joy/cmd_vel"),
+             "/unitree_a1_legged/controllers/cmd_vel"),
             ("/unitree_a1_neural_control/input/state", "/unitree_a1_legged/state"),
             ("/unitree_a1_neural_control/output/command",
-             "/unitree_a1_legged/controller/nn/cmd"),
-            ("/unitree_a1_neural_control/service/reset",
-             "/unitree_a1_legged/nn/reset_controller"),
+             "/unitree_a1_legged/cmd"),
             ("/unitree_a1_neural_control/input/imu",
-             ("/unitree_a1_legged/sensors/imu/data_raw")),
+             ("/unitree_a1_legged/sensors/imu/data")),
         ],
         extra_arguments=[{'use_intra_process_comms': True}]
     )
@@ -160,7 +158,7 @@ def launch_setup(context, *args, **kwargs):
     imu_madgwick_component = ComposableNode(
         package='imu_filter_madgwick',
         plugin='ImuFilterMadgwickRos',
-        name='imu_filter',
+        name='unitree_a1_imu_filter',
         remappings=[
             ("/imu/data_raw", "/unitree_a1_legged/sensors/imu/data_raw"),
             ("/imu/data", "/unitree_a1_legged/sensors/imu/data"),

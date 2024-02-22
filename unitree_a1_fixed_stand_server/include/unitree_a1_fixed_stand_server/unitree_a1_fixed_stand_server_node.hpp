@@ -50,6 +50,16 @@ private:
     const std::shared_ptr<FixedStandGoal> goal_handle);
   void executeFixedStand(
     const std::shared_ptr<FixedStandGoal> goal_handle);
+  rclcpp_action::Server<FixedStand>::SharedPtr hold_position_server_;
+  rclcpp_action::GoalResponse handleHoldPositionGoal(
+    const rclcpp_action::GoalUUID & uuid,
+    std::shared_ptr<const FixedStand::Goal> goal);
+  rclcpp_action::CancelResponse handleHoldPositionCancel(
+    const std::shared_ptr<FixedStandGoal> goal_handle);
+  void handleAcceptedHoldPosition(
+    const std::shared_ptr<FixedStandGoal> goal_handle);
+  void executeHoldPosition(
+    const std::shared_ptr<FixedStandGoal> goal_handle);
   void stateCallback(const LowState::SharedPtr msg);
 };
 }  // namespace unitree_a1_fixed_stand_server

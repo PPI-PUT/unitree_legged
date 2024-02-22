@@ -26,33 +26,36 @@ namespace unitree_a1_fixed_stand_server
 using LowState = unitree_a1_legged_msgs::msg::LowState;
 using LowCmd = unitree_a1_legged_msgs::msg::LowCmd;
 using QuadrupedCmd = unitree_a1_legged_msgs::msg::QuadrupedCmd;
+using QuadrupedState = unitree_a1_legged_msgs::msg::QuadrupedState;
 
 class UNITREE_A1_FIXED_STAND_SERVER_PUBLIC UnitreeFixedStandServer
 {
 public:
   UnitreeFixedStandServer();
-  void fixedStand(LowState::SharedPtr state);
-  float getPercent() const;
-  QuadrupedCmd getCmd() const;
+  LowCmd fixedStand(
+    const QuadrupedState & motor_state,
+    const builtin_interfaces::msg::Time & stamp,
+    float & percent);
+  LowCmd holdPosition(
+    const QuadrupedState & state,
+    const builtin_interfaces::msg::Time & stamp);
+  void reset();
 
 private:
   float steps_;
-  float percent_;
   int motiontime_;
   bool init_;
-  float hip_kp_;
-  float hip_kd_;
-  float thigh_kp_;
-  float thigh_kd_;
-  float calf_kp_;
-  float calf_kd_;
-  QuadrupedCmd cmd_;
   std::array<float, 12> lastPos_;
   std::array<float, 12> standPos_;
-  void reset();
   void initParams();
-  void targetToCmd(const std::vector<float> & targetPos);
-  void initPose(LowState::SharedPtr state);
+  void targetToCmd(QuadrupedCmd & cmd, const std::vector<float> & targetPos);
+  void initPose(const QuadrupedState & state);
+  QuadrupedCmd initStandGains();
+  QuadrupedCmd initHoldGains();
+  QuadrupedCmd initGains(
+    float hip_kp, float hip_kd, float thigh_kp, float thigh_kd, float calf_kp,
+    float calf_kd);
+  std::vector<float> quadrupedStatetoVector(const QuadrupedState & state);
   double jointLinearInterpolation(
     const double initPos, const double targetPos,
     const double percent) const;

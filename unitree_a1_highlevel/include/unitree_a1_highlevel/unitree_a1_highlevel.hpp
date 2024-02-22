@@ -21,12 +21,16 @@
 #include <unitree_a1_legged_msgs/srv/gait.hpp>
 #include <unitree_a1_legged_msgs/action/fixed_stand.hpp>
 #include <unitree_a1_legged_msgs/msg/low_cmd.hpp>
+#include <unitree_a1_legged_msgs/msg/twist_stamped.hpp>
+#include <unitree_a1_legged_msgs/msg/controller_type.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 namespace unitree_a1_highlevel
 {
 enum class State
 {
   UNKNOWN,
   STOP,
+  GROUND,
   STAND,
   HOLD,
   WALK
@@ -38,6 +42,7 @@ public:
   UnitreeStateMachine();
   void nextState();
   State getState() const;
+  uint8_t getControllerType() const;
   void setState(State state);
 
 private:

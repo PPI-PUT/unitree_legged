@@ -43,6 +43,15 @@ UnitreeFixedStandServerNode::UnitreeFixedStandServerNode(const rclcpp::NodeOptio
       &UnitreeFixedStandServerNode::handleFixedStandCancel, this, _1),
     std::bind(
       &UnitreeFixedStandServerNode::handleAcceptedFixedStand, this, _1));
+    hold_position_server_ = rclcpp_action::create_server<FixedStand>(
+    this,
+    "~/action/hold_position",
+    std::bind(
+      &UnitreeFixedStandServerNode::handleHoldPositionGoal, this, _1, _2),
+    std::bind(
+      &UnitreeFixedStandServerNode::handleHoldPositionCancel, this, _1),
+    std::bind(
+      &UnitreeFixedStandServerNode::handleAcceptedHoldPosition, this, _1));
 }
 
 rclcpp_action::GoalResponse UnitreeFixedStandServerNode::handleFixedStandGoal(
@@ -60,7 +69,7 @@ rclcpp_action::CancelResponse UnitreeFixedStandServerNode::handleFixedStandCance
   RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
   (void)goal_handle;
   // send 0 to all motors
-  // reset fixed stand
+  unitree_a1_fixed_stand_server_->reset();
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
@@ -77,6 +86,7 @@ void UnitreeFixedStandServerNode::executeFixedStand(
 {
   rclcpp::Rate loop_rate(request_fixed_stand_rate_);
   const auto goal = goal_handle->get_goal();
+  unitree_a1_fixed_stand_server_->reset();
   auto feedback = std::make_shared<FixedStand::Feedback>();
   auto & partial_step = feedback->percent;
   auto result = std::make_shared<FixedStand::Result>();
@@ -85,13 +95,8 @@ void UnitreeFixedStandServerNode::executeFixedStand(
       goal_handle->canceled(result);
       return;
     }
-    unitree_a1_fixed_stand_server_->fixedStand(state_);
-    partial_step = unitree_a1_fixed_stand_server_->getPercent() * 100.0;
+    auto cmd = unitree_a1_fixed_stand_server_->fixedStand(state_->motor_state, this->now(), partial_step);
     goal_handle->publish_feedback(feedback);
-    auto cmd = LowCmd();
-    cmd.common.mode = 0x0A;
-    cmd.header.stamp = this->now();
-    cmd.motor_cmd = unitree_a1_fixed_stand_server_->getCmd();
     pub_cmd_->publish(cmd);
     // if partial_step == 100 then goal succeeded
     if (partial_step == 100.0) {
@@ -101,6 +106,57 @@ void UnitreeFixedStandServerNode::executeFixedStand(
   }
   result->success = true;
   goal_handle->succeed(result);
+}
+
+rclcpp_action::GoalResponse UnitreeFixedStandServerNode::handleHoldPositionGoal(
+  const rclcpp_action::GoalUUID & uuid,
+  std::shared_ptr<const FixedStand::Goal> goal)
+{
+  RCLCPP_INFO(this->get_logger(), "Received goal request with order %d", goal->start);
+  (void)uuid;
+  return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+}
+
+rclcpp_action::CancelResponse UnitreeFixedStandServerNode::handleHoldPositionCancel(
+  const std::shared_ptr<FixedStandGoal> goal_handle)
+{
+  RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+  (void)goal_handle;
+  // send 0 to all motors
+  unitree_a1_fixed_stand_server_->reset();
+  return rclcpp_action::CancelResponse::ACCEPT;
+}
+
+void UnitreeFixedStandServerNode::handleAcceptedHoldPosition(
+  const std::shared_ptr<FixedStandGoal> goal_handle)
+{
+  std::thread{std::bind(
+      &UnitreeFixedStandServerNode::executeHoldPosition, this,
+      std::placeholders::_1), goal_handle}.detach();
+}
+
+void UnitreeFixedStandServerNode::executeHoldPosition(
+  const std::shared_ptr<FixedStandGoal> goal_handle)
+{
+  rclcpp::Rate loop_rate(request_fixed_stand_rate_);
+  const auto goal = goal_handle->get_goal();
+  auto feedback = std::make_shared<FixedStand::Feedback>();
+  auto & partial_step = feedback->percent;
+  auto result = std::make_shared<FixedStand::Result>();
+  while (rclcpp::ok()) {
+    if (goal_handle->is_canceling() ) {
+      goal_handle->canceled(result);
+      return;
+    }
+    partial_step = 100.0;
+    goal_handle->publish_feedback(feedback);
+    auto cmd = unitree_a1_fixed_stand_server_->holdPosition(state_->motor_state, this->now());
+    pub_cmd_->publish(cmd);
+    loop_rate.sleep();
+  }
+  result->success = true;
+  goal_handle->succeed(result);
+
 }
 
 void UnitreeFixedStandServerNode::stateCallback(const LowState::SharedPtr msg)

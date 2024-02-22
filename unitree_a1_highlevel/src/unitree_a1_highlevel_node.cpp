@@ -20,24 +20,13 @@ UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & opt
 :  Node("unitree_a1_highlevel", options)
 {
   unitree_a1_state_machine_ = std::make_unique<unitree_a1_highlevel::UnitreeStateMachine>();
-  stand_cmd_msg_ = std::make_shared<LowCmd>();
-  walk_cmd_msg_ = std::make_shared<LowCmd>();
-  auto sub_options = rclcpp::SubscriptionOptions();
-  sub_options.topic_stats_options.state = rclcpp::TopicStatisticsState::Enable;
-  sub_options.topic_stats_options.publish_period = std::chrono::seconds(1);
-  sub_options.topic_stats_options.publish_topic = "~/statistics";
+  sub_twist_ = this->create_subscription<TwistStamped>(
+    "~/input/twist", 1,
+    std::bind(&UnitreeStateMachineNode::twistCallback, this, _1));
   auto qos = rclcpp::QoS(1);
   qos.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
   qos.durability_volatile();
-  pub_cmd_ = this->create_publisher<LowCmd>("~/output/cmd", qos);
-  joint_state_publisher_ =
-    this->create_publisher<sensor_msgs::msg::JointState>("~/output/nn/joint_states", 1);
-  stand_cmd_ = this->create_subscription<LowCmd>(
-    "~/input/stand", 1,
-    std::bind(&UnitreeStateMachineNode::standCallback, this, _1));
-  walk_cmd_ = this->create_subscription<LowCmd>(
-    "~/input/walk", qos,
-    std::bind(&UnitreeStateMachineNode::walkCallback, this, _1), sub_options);
+  pub_twist_ = this->create_publisher<TwistStampedHighlevel>("~/output/twist", qos);
   server_gait_ = this->create_service<Gait>(
     "~/service/gait",
     std::bind(
@@ -45,55 +34,25 @@ UnitreeStateMachineNode::UnitreeStateMachineNode(const rclcpp::NodeOptions & opt
   fixed_stand_client_ = rclcpp_action::create_client<FixedStand>(
     this,
     "~/action/fixed_stand");
-  client_reset_controller_ = this->create_client<Trigger>("~/service/reset_controller");
+  hold_position_client_ = rclcpp_action::create_client<FixedStand>(
+    this,
+    "~/action/hold_position");
 }
-void UnitreeStateMachineNode::standCallback(LowCmd::UniquePtr msg)
+void UnitreeStateMachineNode::twistCallback(TwistStamped::UniquePtr msg)
 {
-  if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::STAND) {
-    std::lock_guard<std::mutex> lock(publisherMutex);
-    *stand_cmd_msg_ = *msg;
-    pub_cmd_->publish(std::move(msg));
-  }
-}
-void UnitreeStateMachineNode::walkCallback(LowCmd::UniquePtr msg)
-{
-  if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::HOLD) {
-    std::lock_guard<std::mutex> lock(publisherMutex);
-    pub_cmd_->publish(*stand_cmd_msg_);
-    RCLCPP_INFO(this->get_logger(), "Holding...");
-  }
-  if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::WALK) {
-    std::lock_guard<std::mutex> lock(publisherMutex);
-    auto joints = sensor_msgs::msg::JointState();
-    joints.header.stamp = this->now();
-    joints.header.frame_id = "trunk";
-    joints.name = {"FR_hip_joint", "FR_thigh_joint", "FR_calf_joint", "FL_hip_joint",
-      "FL_thigh_joint", "FL_calf_joint", "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint",
-      "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint"};
-    joints.position = {
-      msg->motor_cmd.front_right.hip.q,
-      msg->motor_cmd.front_right.thigh.q,
-      msg->motor_cmd.front_right.calf.q,
-      msg->motor_cmd.front_left.hip.q,
-      msg->motor_cmd.front_left.thigh.q,
-      msg->motor_cmd.front_left.calf.q,
-      msg->motor_cmd.rear_right.hip.q,
-      msg->motor_cmd.rear_right.thigh.q,
-      msg->motor_cmd.rear_right.calf.q,
-      msg->motor_cmd.rear_left.hip.q,
-      msg->motor_cmd.rear_left.thigh.q,
-      msg->motor_cmd.rear_left.calf.q};
-    pub_cmd_->publish(std::move(msg));
-    joint_state_publisher_->publish(joints);
-
-  }
+  auto twist = std::make_unique<TwistStampedHighlevel>();
+  twist->header.stamp = this->get_clock()->now();
+  twist->twist = msg->twist;
+  twist->controller_type.type = unitree_a1_state_machine_->getControllerType();
+  pub_twist_->publish(std::move(twist));
 }
 void UnitreeStateMachineNode::resultCallback(const FixedStandGoal::WrappedResult & result)
 {
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
-      RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      RCLCPP_INFO(this->get_logger(), "Stand succeeded");
       unitree_a1_state_machine_->setState(unitree_a1_highlevel::State::HOLD);
+      this->callHoldPosition();
       break;
     case rclcpp_action::ResultCode::ABORTED:
       RCLCPP_INFO(this->get_logger(), "Goal was aborted");
@@ -107,55 +66,79 @@ void UnitreeStateMachineNode::resultCallback(const FixedStandGoal::WrappedResult
   }
 }
 
+void UnitreeStateMachineNode::callHoldPosition()
+{
+  if (!hold_position_client_->wait_for_action_server(std::chrono::milliseconds(500))) {
+    RCLCPP_ERROR(
+      this->get_logger(),
+      "Hold position action server not available after waiting");
+    return;
+  }
+  auto goal = FixedStand::Goal();
+  goal.start = true;
+  auto goal_handle_future = hold_position_client_->async_send_goal(goal);
+}
+
+void UnitreeStateMachineNode::callStand()
+{
+  if (!fixed_stand_client_->wait_for_action_server(std::chrono::milliseconds(500))) {
+    RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
+    return;
+  }
+  auto goal = FixedStand::Goal();
+  goal.start = true;
+  auto send_goal_options = rclcpp_action::Client<FixedStand>::SendGoalOptions();
+  send_goal_options.result_callback =
+    std::bind(&UnitreeStateMachineNode::resultCallback, this, _1);
+  auto goal_handle_future = fixed_stand_client_->async_send_goal(goal, send_goal_options);
+}
+
 void UnitreeStateMachineNode::handleGait(
   const std::shared_ptr<Gait::Request> request,
   std::shared_ptr<Gait::Response> response)
 {
   switch (request->method.type) {
-    case 1:
+    case ControllerType::STOP:
       {
         RCLCPP_INFO(this->get_logger(), "STOP");
         unitree_a1_state_machine_->setState(unitree_a1_highlevel::State::STOP);
+        fixed_stand_client_->async_cancel_all_goals();
+        hold_position_client_->async_cancel_all_goals();
       } break;
-    case 2:
+    case ControllerType::API:
       {
         RCLCPP_INFO(this->get_logger(), "API");
       } break;
-    case 3:
+    case ControllerType::FIXED_STAND:
       {
-        if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::UNKNOWN) {
-          unitree_a1_state_machine_->nextState(); // skip UNKNOWN state
-          // unitree_a1_state_machine_->setState(unitree_a1_highlevel::State::STAND);
-          RCLCPP_INFO(this->get_logger(), "SKIP UNKNOWN AND STOP STATE");
-        } else {return;}
-        unitree_a1_state_machine_->nextState();
-        RCLCPP_INFO(this->get_logger(), "STAND");
-        RCLCPP_INFO(
-          this->get_logger(), "State: %d",
-          static_cast<int>(unitree_a1_state_machine_->getState()));
-        if (!fixed_stand_client_->wait_for_action_server(std::chrono::milliseconds(500))) {
-          RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
+        if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::UNKNOWN ||
+          unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::STOP)
+        {
+          unitree_a1_state_machine_->setState(unitree_a1_highlevel::State::GROUND);
+          RCLCPP_INFO(
+            this->get_logger(), "Robot is on the ground, setting state to STAND is allowed");
+        } else if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::GROUND) {
+          unitree_a1_state_machine_->setState(unitree_a1_highlevel::State::STAND);
+          RCLCPP_INFO(this->get_logger(), "Robot is standing...");
+          RCLCPP_INFO(
+            this->get_logger(), "State: %d",
+            static_cast<int>(unitree_a1_state_machine_->getState()));
+          this->callStand();
+        }
+      } break;
+    case ControllerType::NEURAL:
+      {
+        if (unitree_a1_state_machine_->getState() == unitree_a1_highlevel::State::HOLD) {
+          unitree_a1_state_machine_->setState(unitree_a1_highlevel::State::WALK);
+        } else {
+          RCLCPP_INFO(this->get_logger(), "Robot is not standing, cannot walk");
           response->success = false;
           return;
         }
-        auto goal = FixedStand::Goal();
-        goal.start = true;
-        auto send_goal_options = rclcpp_action::Client<FixedStand>::SendGoalOptions();
-        send_goal_options.result_callback =
-          std::bind(&UnitreeStateMachineNode::resultCallback, this, _1);
-
-        auto goal_handle_future = fixed_stand_client_->async_send_goal(goal, send_goal_options);
-      } break;
-    case 4:
-      {
-        client_reset_controller_->async_send_request(
-          std::make_shared<Trigger::Request>());
-        unitree_a1_state_machine_->nextState();
-        RCLCPP_INFO(this->get_logger(), "Walk");
       } break;
     default:
       {
-        RCLCPP_INFO(this->get_logger(), "Unknown");
+        RCLCPP_ERROR(this->get_logger(), "Unknown controller type");
         response->success = true;
         return;
       } break;

@@ -25,6 +25,9 @@
 namespace unitree_a1_highlevel
 {
 using UnitreeStateMachinePtr = std::unique_ptr<unitree_a1_highlevel::UnitreeStateMachine>;
+using ControllerType = unitree_a1_legged_msgs::msg::ControllerType;
+using TwistStamped = geometry_msgs::msg::TwistStamped;
+using TwistStampedHighlevel = unitree_a1_legged_msgs::msg::TwistStamped;
 using FixedStand = unitree_a1_legged_msgs::action::FixedStand;
 using FixedStandGoal = rclcpp_action::ClientGoalHandle<FixedStand>;
 using Gait = unitree_a1_legged_msgs::srv::Gait;
@@ -42,21 +45,18 @@ private:
   UnitreeStateMachinePtr unitree_a1_state_machine_{nullptr};
   rclcpp::Service<Gait>::SharedPtr server_gait_;
   rclcpp_action::Client<FixedStand>::SharedPtr fixed_stand_client_;
-  rclcpp::Subscription<LowCmd>::SharedPtr stand_cmd_;
-  LowCmd::SharedPtr stand_cmd_msg_;
-  void standCallback(LowCmd::UniquePtr msg);
-  rclcpp::Subscription<LowCmd>::SharedPtr walk_cmd_;
-  LowCmd::SharedPtr walk_cmd_msg_;
-  void walkCallback(LowCmd::UniquePtr msg);
-  rclcpp::Publisher<LowCmd>::SharedPtr pub_cmd_;
+  rclcpp_action::Client<FixedStand>::SharedPtr hold_position_client_;
+  rclcpp::Subscription<TwistStamped>::SharedPtr sub_twist_;
+  rclcpp::Publisher<TwistStampedHighlevel>::SharedPtr pub_twist_;
+  void twistCallback(TwistStamped::UniquePtr msg);
   rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_publisher_;
   void controlLoop();
   void resultCallback(const FixedStandGoal::WrappedResult & result);
+  void callHoldPosition();
+  void callStand();
   void handleGait(
     const std::shared_ptr<Gait::Request> request,
     std::shared_ptr<Gait::Response> response);
-  rclcpp::Client<Trigger>::SharedPtr client_reset_controller_;
 };
 }  // namespace unitree_a1_highlevel
 
