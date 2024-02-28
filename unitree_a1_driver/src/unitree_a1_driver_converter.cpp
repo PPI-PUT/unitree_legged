@@ -97,6 +97,7 @@ void Converter::msgToCmd(const unitree_a1_legged_msgs::msg::LowCmd::SharedPtr ms
     return;
   }
   for (const auto &[key, value] : Converter::jointIndexMap) {
+    (void) key; 
     if (msg->common.mode != 0) {
       cmd.motorCmd[value].mode = msg->common.mode;
     }
