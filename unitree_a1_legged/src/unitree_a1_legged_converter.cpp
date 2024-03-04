@@ -97,6 +97,7 @@ void Converter::msgToCmd(const unitree_a1_legged_msgs::msg::LowCmd::SharedPtr ms
     return;
   }
   for (const auto &[key, value] : Converter::jointIndexMap) {
+    (void) key;
     if (msg->common.mode != 0) {
       cmd.motorCmd[value].mode = msg->common.mode;
     }
@@ -136,6 +137,7 @@ void Converter::msgToCmd(
     return;
   }
   for (const auto &[key, value] : Converter::jointIndexMap) {
+    (void) key;
     cmd.motorCmd[value].mode = msg->mode;
     cmd.motorCmd[value].Kp = msg->kp;
     cmd.motorCmd[value].Kd = msg->kd;
@@ -212,6 +214,7 @@ sensor_msgs::msg::JointState Converter::getJointStateMsg(const LowState & state)
   msg.velocity.resize(Converter::getJointCount());
   msg.effort.resize(Converter::getJointCount());
   for (const auto &[key, value] : Converter::jointIndexMap) {
+    (void) key;
     msg.position[value] = state.motorState[value].q;
     msg.velocity[value] = state.motorState[value].dq;
     msg.effort[value] = state.motorState[value].tauEst;
