@@ -1,4 +1,4 @@
-imu_filter:
+unitree_a1_imu_filter:
   ros__parameters:
     stateless: false
     use_mag: false
