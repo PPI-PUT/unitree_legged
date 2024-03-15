@@ -104,8 +104,8 @@ def launch_setup(context, *args, **kwargs):
             ("/unitree_a1_highlevel/service/gait",
              "unitree_a1_legged/service/gait"),
         ] + action_remap('/unitree_a1_highlevel/action/fixed_stand', '/unitree_a1_legged/action/stand') +
-        action_remap('/unitree_a1_highlevel/action/fixed_stand',
-                     '/unitree_a1_legged/action/stand'),
+        action_remap('/unitree_a1_highlevel/action/hold_position',
+                     '/unitree_a1_legged/action/hold_position'),
         extra_arguments=[{'use_intra_process_comms': True}]
     )
     stand_params = PathJoinSubstitution([
